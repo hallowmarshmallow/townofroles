@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>TownOfUs.Updater.Patcher</AssemblyName>
+    <RootNamespace>TownOfUs.Updater.Patcher</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx.Core">
+      <HintPath>refs/BepInEx.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="BepInEx.Preloader.Core">
+      <HintPath>refs/BepInEx.Preloader.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="SemanticVersioning">
+      <HintPath>refs/SemanticVersioning.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
