@@ -1,8 +1,8 @@
-# Town Of Us (ManuAPI port) for Classic Us
+# Town Of Roles
 
 A port of the classic, deprecated **Town-Of-Us** Among Us role mod onto the modern
-**Classic Us** game, built on **ClassicUs.Manactor** (networking) and
-**ClassicUs.ManuAPI** (roles / abilities / kills / UI), both by TechDevOfficial.
+**Classic Us** game, built on **ClassicUs.Reactor** (networking) and
+**ClassicUs.MarshAPI** (roles / abilities / kills / UI), both by TechDevOfficial, and i forked them and updated.
 
 ```
 Classic Us (game, DlovanSl)
