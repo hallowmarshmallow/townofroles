@@ -190,7 +190,8 @@ inside/outside dropship positions. They are intended for lobby/freeplay testing;
 use them only when a map is loaded. `/system` is host-only and uses the game's
 native system-alert RPC. `/rainbow` uses Classic Us 8.9's native
 `PlayerColorSetter.EnableRainbowMode()` and is a local visual effect; `/gradient`
-uses low-frequency stepped vanilla colors. Neither command injects a shader or
+applies the hardcoded hallowmarsh blue/pink gradient to your own body via the
+game's native `PlayerMaterial` tint path. Neither command injects a shader or
 spams color RPCs.
 
 The command layer is disabled with:

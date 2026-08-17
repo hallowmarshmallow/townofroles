@@ -527,11 +527,22 @@ namespace TownOfUs.ManuAPI.Roles
             if (_renderer == null) _renderer = clone.GetComponentInChildren<SpriteRenderer>(true);
             if (_renderer != null)
             {
-                var icon = CreateIcon(_renderer.sprite);
+                var originalSprite = _renderer.sprite;
+                var icon = CreateIcon(originalSprite);
                 if (icon != null) _renderer.sprite = icon;
                 _renderer.enabled = true;
                 _renderer.gameObject.SetActive(true);
+                // Size the custom art to the native button artwork so a role icon
+                // renders the same on-screen size as the vanilla Kill/Use buttons
+                // instead of appearing oversized.
                 _renderer.transform.localScale = Vector3.one;
+                if (icon != null && icon != originalSprite && originalSprite != null)
+                {
+                    var nativeWidth = originalSprite.bounds.size.x;
+                    var iconWidth = icon.bounds.size.x;
+                    if (nativeWidth > 0.0001f && iconWidth > 0.0001f)
+                        _renderer.transform.localScale = Vector3.one * (nativeWidth / iconWidth);
+                }
             }
 
             var passive = clone.GetComponentInChildren<PassiveButton>(true);

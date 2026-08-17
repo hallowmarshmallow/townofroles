@@ -1,15 +1,17 @@
 using System;
+using UnityEngine;
 
 namespace TownOfUs.ManuAPI.Core
 {
     internal static class VisualEffects
     {
-        // Gradient mode uses ordinary vanilla color IDs. Rainbow mode is handled
-        // by Classic Us's native PlayerColorSetter component below.
-        private static readonly int[] Palette = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+        // The "hallowmarsh" gradient: the creator's smooth blue/pink cycling
+        // color, hardcoded here and applied to the local player's body renderers
+        // via the game's own PlayerMaterial path (same one the Camouflager uses).
+        private static readonly Color GradientBlue = new(0.30f, 0.62f, 1f, 1f);
+        private static readonly Color GradientPink = new(1f, 0.45f, 0.62f, 1f);
+        private const float GradientSpeed = 2.5f;
 
-        private static DateTime _nextStep = DateTime.MinValue;
-        private static int _step;
         private static bool _gradient;
         private static bool _rainbow;
         private static int _restoreColor = -1;
@@ -23,15 +25,17 @@ namespace TownOfUs.ManuAPI.Core
             if (enabled)
             {
                 DisableNativeRainbow();
-                _gradient = true;
                 _rainbow = false;
+                var local = PlayerControl.LocalPlayer;
+                if (local != null && local.Data != null)
+                    RememberVanillaColor(local);
+                _gradient = true;
             }
             else
             {
                 _gradient = false;
                 if (!_rainbow) RestoreVanillaColor();
             }
-            _nextStep = DateTime.MinValue;
         }
 
         public static void SetRainbow(bool enabled)
@@ -55,14 +59,11 @@ namespace TownOfUs.ManuAPI.Core
                 DisableNativeRainbow();
                 if (!_gradient) RestoreVanillaColor();
             }
-            _nextStep = DateTime.MinValue;
         }
 
         public static void Tick()
         {
             if (!_gradient && !_rainbow) return;
-            if (DateTime.UtcNow < _nextStep) return;
-            _nextStep = DateTime.UtcNow.AddMilliseconds(850);
 
             var local = PlayerControl.LocalPlayer;
             if (local == null || local.Data == null) return;
@@ -83,9 +84,11 @@ namespace TownOfUs.ManuAPI.Core
                 return;
             }
 
+            // Smooth blue/pink hallowmarsh gradient, re-tinted every FixedUpdate.
             RememberVanillaColor(local);
-            local.SetColor(Palette[_step % Palette.Length]);
-            _step++;
+            var t = (Mathf.Sin(Time.unscaledTime * GradientSpeed) + 1f) / 2f;
+            var color = Color.Lerp(GradientBlue, GradientPink, t);
+            TintLocalBody(local, color);
         }
 
         public static void Reset()
@@ -94,8 +97,24 @@ namespace TownOfUs.ManuAPI.Core
             _rainbow = false;
             DisableNativeRainbow();
             RestoreVanillaColor();
-            _nextStep = DateTime.MinValue;
-            _step = 0;
+        }
+
+        private static void TintLocalBody(PlayerControl local, Color color)
+        {
+            foreach (var renderer in local.GetComponentsInChildren<Renderer>(true))
+            {
+                if (renderer == null) continue;
+                try { PlayerMaterial.SetColors(color, renderer); } catch { }
+            }
+        }
+
+        private static void RestoreLocalBody(PlayerControl local, int colorId)
+        {
+            foreach (var renderer in local.GetComponentsInChildren<Renderer>(true))
+            {
+                if (renderer == null) continue;
+                try { PlayerControl.SetPlayerMaterialColors(colorId, renderer); } catch { }
+            }
         }
 
         private static void RememberVanillaColor(PlayerControl local)
@@ -115,7 +134,10 @@ namespace TownOfUs.ManuAPI.Core
         {
             var local = PlayerControl.LocalPlayer;
             if (local != null && local.Data != null && _restoreColor >= 0)
-                local.SetColor(_restoreColor);
+            {
+                try { local.SetColor(_restoreColor); } catch { }
+                RestoreLocalBody(local, _restoreColor);
+            }
             _restoreColor = -1;
         }
     }
