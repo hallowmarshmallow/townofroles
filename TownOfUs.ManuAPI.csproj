@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>TownOfUs.ManuAPI</AssemblyName>
+    <RootNamespace>TownOfUs.ManuAPI</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <NoWarn>CS0626;CS0649;CS8632;CS0108</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- These generated artifacts are present in the source checkout.  Without
+         excluding them the SDK compiles both Debug and Release AssemblyInfo files,
+         producing duplicate assembly attributes. -->
+    <Compile Remove="UpdaterPatcher/**;obj/**;bin/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets/OriginalTownOfUs/Roles/*.png" />
+    <EmbeddedResource Include="Assets/OriginalTownOfUs/Resources/*.png" LogicalName="TownOfUs.ManuAPI.Assets.OriginalTownOfUs.Resources.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Assets/OriginalTownOfUs/Resources/glitchbundle" LogicalName="TownOfUs.ManuAPI.Assets.OriginalTownOfUs.Resources.glitchbundle" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClassicUs.GameLibs" Version="2026.8.16.1" PrivateAssets="all" />
+    <PackageReference Include="ClassicUs.Manactor" Version="1.1.0" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="ClassicUs.ManuAPI" Version="1.5.1" PrivateAssets="all" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <!-- After a successful build, drop the plugin straight into the game's plugin folder
+       when ClassicUsGameDir is set (e.g. an environment variable or -p:ClassicUsGameDir=...). -->
+  <Target Name="CopyToPlugins" AfterTargets="Build" Condition="'$(ClassicUsGameDir)' != ''">
+    <MakeDir Directories="$(ClassicUsGameDir)\BepInEx\plugins" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(ClassicUsGameDir)\BepInEx\plugins" />
+    <Message Importance="high" Text="Copied $(AssemblyName).dll -> $(ClassicUsGameDir)\BepInEx\plugins" />
+  </Target>
+
+</Project>
