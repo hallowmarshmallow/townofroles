@@ -17,6 +17,7 @@ namespace TownOfUs.ManuAPI.Commands
         private const string ReviveRpc = "townofus.Revive";
         private const string RequestCustomCommandRpc = "townofus.RequestCustomCommand";
         private const string CustomCommandRpc = "townofus.CustomCommand";
+        private const string SystemMessageRpc = "townofus.SystemMessage";
         public static bool TryHandle(PlayerControl sender, string text)
         {
             if (sender == null || string.IsNullOrWhiteSpace(text)) return false;
@@ -44,6 +45,10 @@ namespace TownOfUs.ManuAPI.Commands
                     return true;
                 case "color":
                     Color(sender, args);
+                    return true;
+                case "code":
+                case "lobbycode":
+                    LobbyCode(sender, args);
                     return true;
                 case "system":
                 case "systemmessage":
@@ -90,9 +95,10 @@ namespace TownOfUs.ManuAPI.Commands
                 "Town of Roles commands:",
                 "/forcestart — start the game now (host)",
                 "/nickname <name> — change your name",
-                "/gradient [on|off] — gradient skin",
+                "/gradient [on|off] — hallowmarsh gradient",
                 "/rainbow [on|off] — rainbow skin",
                 "/color gradient|rainbow [on|off]",
+                "/code <word>|off — custom lobby code (host)",
                 "/system <msg> — host system broadcast",
                 "/tpin|/tpout [player] — dropship teleport (host)",
                 "/nogameend [on|off] — disable game end (host)",
@@ -467,7 +473,7 @@ namespace TownOfUs.ManuAPI.Commands
             }
 
             VisualEffects.SetGradient(enabled.Value);
-            Local($"Local gradient skin {(enabled.Value ? "enabled" : "disabled")}.");
+            Local($"hallowmarsh gradient {(enabled.Value ? "enabled" : "disabled")}.");
         }
 
         private static void Rainbow(PlayerControl sender, string[] args)
@@ -507,6 +513,39 @@ namespace TownOfUs.ManuAPI.Commands
             Local("Use /color gradient or /color rainbow.");
         }
 
+        private static void LobbyCode(PlayerControl sender, string[] args)
+        {
+            if (!RequireHost(sender)) return;
+
+            if (args.Length == 0)
+            {
+                var current = Core.LobbyCode.ActiveCode;
+                Local(string.IsNullOrEmpty(current)
+                    ? "Usage: /code <word> or /code off"
+                    : "Current lobby code: " + current);
+                return;
+            }
+
+            var word = string.Join(" ", args).Trim();
+            var upper = word.ToUpperInvariant();
+            if (upper == "OFF" || upper == "DISABLE" || upper == "CLEAR" || upper == "NONE" || upper == "RESET")
+            {
+                Core.LobbyCode.Set(string.Empty);
+                Local("Custom lobby code disabled.");
+                return;
+            }
+
+            var code = Core.LobbyCode.Normalize(word);
+            if (string.IsNullOrEmpty(code))
+            {
+                Local("Lobby code must be 1-6 letters or digits (A-Z, 0-9).");
+                return;
+            }
+
+            Core.LobbyCode.Set(code);
+            Local("Lobby code set to " + code + " (display alias — friends still join with the real code).");
+        }
+
         private static void SystemMessage(PlayerControl sender, string[] args)
         {
             if (!RequireHost(sender)) return;
@@ -520,16 +559,26 @@ namespace TownOfUs.ManuAPI.Commands
             if (message.Length > 120)
                 message = message.Substring(0, 120);
 
-            // Broadcast through the game's native "SYSTEM ALERT" popup. The local
-            // display is unconditional so the host always sees it even if the lobby
-            // broadcast fails (e.g. freeplay, where the RPC allocator never
-            // finalizes); the CustomCommand RPC handler shows the same popup on
-            // every client. Still host-only so clients cannot impersonate server
-            // messages.
+            // Show the message locally AND broadcast it to every client through the
+            // RPC mux, so the whole lobby sees the same native "SYSTEM ALERT" popup.
+            // The host shows it directly (the RPC handler skips the host, exactly
+            // like the custom-command path) so the message is never replaced by a
+            // "sent" confirmation. Still host-only so clients cannot impersonate
+            // server messages.
             SystemChat.Show(message);
-            try { TownOfUsRpcMux.Send(CustomCommandRpc, message); }
+            try { TownOfUsRpcMux.Send(SystemMessageRpc, message); }
             catch (Exception e) { Warn("Lobby broadcast failed: " + e.Message); }
-            Local("System message sent.");
+        }
+
+        [ManactorRpc(SystemMessageRpc)]
+        private static void OnSystemMessageRpc(byte senderId, string message)
+        {
+            // The host already displayed the message when it broadcast it; only
+            // remote clients display here. Exactly one display per client.
+            var client = AmongUsClient.Instance;
+            if (client != null && client.AmHost) return;
+            if (string.IsNullOrWhiteSpace(message)) return;
+            SystemChat.Show(message);
         }
 
         private static void Teleport(PlayerControl sender, string[] args, bool intoDropship)

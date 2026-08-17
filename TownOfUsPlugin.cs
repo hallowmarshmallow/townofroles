@@ -84,6 +84,7 @@ namespace TownOfUs.ManuAPI
         private const string GameConfigHarmonyId = Guid + ".gameconfig";
         private const string JesterHarmonyId = Guid + ".jester";
         private const string AssassinHarmonyId = Guid + ".assassin";
+        private const string LobbyCodeHarmonyId = Guid + ".lobbycode";
 
         public override void Load()
         {
@@ -163,6 +164,16 @@ namespace TownOfUs.ManuAPI
             RpcRegistration.Register(typeof(CreatorColor));
             GameEvents.GameStarted += CreatorColor.OnGameStarted;
             GameEvents.GameEnded += CreatorColor.OnGameEnded;
+
+            // Custom lobby code: display alias for the randomly generated lobby
+            // code (e.g. YOUSEF / MARSHY), synced host -> clients over the RPC mux.
+            // Inert when no code is configured; supports runtime /code toggling.
+            RpcRegistration.Register(typeof(LobbyCode));
+            InstallLobbyCodeHarmony();
+            GameEvents.GameStarted += LobbyCode.OnGameStarted;
+            GameEvents.PlayerJoined += LobbyCode.OnPlayerJoined;
+            LobbyCode.Refresh();
+            Log.LogInfo("Custom lobby code: enabled");
             if (UpdateConfig.Enabled?.Value == true)
             {
                 InstallUpdateHarmony();
@@ -999,6 +1010,22 @@ namespace TownOfUs.ManuAPI
             GameEvents.GameStarted += EngineerAbility.OnGameStarted;
             GameEvents.GameEnded += EngineerAbility.OnGameEnded;
             _engineerEventHooksInstalled = true;
+        }
+
+        private void InstallLobbyCodeHarmony()
+        {
+            // Non-fatal install: a missing GameCode.IntToGameName target on some
+            // build can never prevent the plugin from loading.
+            var harmony = new Harmony(LobbyCodeHarmonyId);
+            try
+            {
+                harmony.CreateClassProcessor(typeof(GameCode_IntToGameName_LobbyCodePatch)).Patch();
+            }
+            catch (Exception e)
+            {
+                Log.LogWarning("Custom lobby code patch skipped: " + e.Message);
+                harmony.UnpatchSelf();
+            }
         }
 
         private void InstallCreatorColorHarmony()

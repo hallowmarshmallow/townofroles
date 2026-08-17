@@ -160,6 +160,8 @@ namespace TownOfUs.ManuAPI.Core
         public static ConfigEntry<bool> NativeMenuRows { get; private set; }
         public static ConfigEntry<bool> ModsMenu { get; private set; }
         public static ConfigEntry<bool> DisableAllPatches { get; private set; }
+        public static ConfigEntry<bool> LobbyCodeEnabled { get; private set; }
+        public static ConfigEntry<string> LobbyCode { get; private set; }
 
         public static void Init(ConfigFile config)
         {
@@ -323,6 +325,12 @@ namespace TownOfUs.ManuAPI.Core
             ModsMenu = config.Bind(
                 "Menu", "ModsMenu", false,
                 "Show the 'Mods' management button in the bottom-right corner of the HUD (list + On/Off toggles for every loaded mod/role). Defaults OFF for HUD stability.");
+            LobbyCodeEnabled = config.Bind(
+                "LobbyCode", "Enabled", false,
+                "Replace the randomly generated lobby code with the custom code below. The custom code is shown to everyone in the lobby. Note: in online mode the random code is the network routing key, so friends still join with the real code (the custom code is a display alias).");
+            LobbyCode = config.Bind(
+                "LobbyCode", "Code", "",
+                "The custom lobby code to show (1-6 letters/digits, e.g. YOUSEF or MARSHY). Leave empty to disable.");
             DisableAllPatches = config.Bind(
                 "Diagnostics", "DisableAllPatches", false,
                 "CRASH DIAGNOSTIC: load the mod completely inert - register with Manactor and read config, but install NO Harmony patches, subscribe to NO game events, and register NO RPC handlers. Use to bisect startup crashes: true = game should launch (roles are inert); false = normal behavior.");
