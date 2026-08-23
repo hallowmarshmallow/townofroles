@@ -233,7 +233,7 @@ namespace TownOfUs.ManuAPI.Core
             GameObject src = null;
             if (hud.FullScreen != null)
             {
-                var comp = hud.FullScreen.TryCast<Component>();
+                var comp = hud.FullScreen as Component;
                 if (comp != null) src = comp.gameObject;
             }
 
@@ -245,8 +245,6 @@ namespace TownOfUs.ManuAPI.Core
                 foreach (var comp in backdrop.GetComponentsInChildren<MonoBehaviour>(true))
                 {
                     if (comp == null) continue;
-                    if (comp.TryCast<SpriteRenderer>() != null) continue;
-                    if (comp.TryCast<Collider2D>() != null) continue;
                     comp.enabled = false;
                     UnityEngine.Object.Destroy(comp);
                 }
@@ -334,7 +332,7 @@ namespace TownOfUs.ManuAPI.Core
 
             MakeButton(key + ".Minus", "-", new Vector3(1.2f, y, 0f), 0.55f, 1.9f,
                 () => Step(key + ".Probability", "float", -5f), true);
-            MakeText("Prob_" + key.Replace(".", "_"), probability.ToString("0") + "%", new Vector3(2.2f, y, 0f), 1.4f, Color.white, 115);
+            MakeText("Prob_" + key.Replace(".", "_"), probability.ToString("0", null) + "%", new Vector3(2.2f, y, 0f), 1.4f, Color.white, 115);
             MakeButton(key + ".Plus", "+", new Vector3(3.1f, y, 0f), 0.55f, 1.9f,
                 () => Step(key + ".Probability", "float", 5f), true);
 
@@ -360,7 +358,7 @@ namespace TownOfUs.ManuAPI.Core
 
             MakeButton(key + ".ChanceMinus", "-", new Vector3(1.65f, y, 0f), 0.55f, 1.9f,
                 () => Step(key + ".Chance", "float", -5f), true);
-            MakeText("Chance_" + key, chance.ToString("0") + "%", new Vector3(2.45f, y, 0f), 1.4f, Color.white, 115);
+            MakeText("Chance_" + key, chance.ToString("0", null) + "%", new Vector3(2.45f, y, 0f), 1.4f, Color.white, 115);
             MakeButton(key + ".ChancePlus", "+", new Vector3(3.25f, y, 0f), 0.55f, 1.9f,
                 () => Step(key + ".Chance", "float", 5f), true);
 
@@ -415,7 +413,7 @@ namespace TownOfUs.ManuAPI.Core
                 float v = RoleSettingsSync.GetFloat(full);
                 MakeButton(full + ".Minus", "-", new Vector3(1.5f, y, 0f), 0.5f, 1.7f,
                     () => Step(full, "float", -1f), true);
-                MakeText("V_" + full, v.ToString("0.#") + "s", new Vector3(2.4f, y, 0f), 1.35f, Color.white, 115);
+                MakeText("V_" + full, v.ToString("0.#", null) + "s", new Vector3(2.4f, y, 0f), 1.35f, Color.white, 115);
                 MakeButton(full + ".Plus", "+", new Vector3(3.3f, y, 0f), 0.5f, 1.7f,
                     () => Step(full, "float", 1f), true);
             }
@@ -512,8 +510,8 @@ namespace TownOfUs.ManuAPI.Core
             foreach (var comp in clone.GetComponentsInChildren<MonoBehaviour>(true))
             {
                 if (comp == null) continue;
-                if (comp.TryCast<PassiveButton>() != null) continue;
-                if (comp.TryCast<TextMeshPro>() != null) continue;
+                if ((comp as PassiveButton) != null) continue;
+                if ((comp as TextMeshPro) != null) continue;
                 comp.enabled = false;
                 UnityEngine.Object.Destroy(comp);
             }

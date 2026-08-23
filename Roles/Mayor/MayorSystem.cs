@@ -71,12 +71,6 @@ namespace TownOfUs.ManuAPI.Roles.Mayor
             }
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte id)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == id) return player;
-            return null;
-        }
     }
 
     /// <summary>
@@ -104,8 +98,7 @@ namespace TownOfUs.ManuAPI.Roles.Mayor
                 foreach (var comp in clone.GetComponentsInChildren<UnityEngine.MonoBehaviour>(true))
                 {
                     if (comp == null) continue;
-                    if (comp.TryCast<PassiveButton>() != null) continue;
-                    if (comp.TryCast<TMPro.TextMeshPro>() != null) continue;
+                    if ((comp as PassiveButton) != null) continue;
                     comp.enabled = false;
                     UnityEngine.Object.Destroy(comp);
                 }

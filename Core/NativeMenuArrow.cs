@@ -88,7 +88,7 @@ namespace TownOfUs.ManuAPI.Core
                 {
                     RemoveFallbackRows(menu); // undo any pre-Start Game-tab injection
                     Log(_anchorGood
-                        ? "arrow created at " + _arrow.transform.position.ToString("F2") + " (top-right anchor)"
+                        ? "arrow created at " + _arrow.transform.position.ToString("F2", null) + " (top-right anchor)"
                         : "arrow created (no tabs/rows yet, will re-anchor on next open)");
                 }
                 return _arrow != null;
@@ -130,8 +130,8 @@ namespace TownOfUs.ManuAPI.Core
             foreach (var comp in clone.GetComponentsInChildren<MonoBehaviour>(true))
             {
                 if (comp == null) continue;
-                if (comp.TryCast<PassiveButton>() != null) continue;
-                if (comp.TryCast<TextMeshPro>() != null) continue;
+                if ((comp as PassiveButton) != null) continue;
+                if ((comp as TextMeshPro) != null) continue;
                 comp.enabled = false;
                 UnityEngine.Object.Destroy(comp);
             }

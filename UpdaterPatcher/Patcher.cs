@@ -142,7 +142,7 @@ namespace TownOfUs.Updater.Patcher
             using var sha = SHA256.Create();
             byte[] hash = sha.ComputeHash(stream);
             var sb = new StringBuilder(hash.Length * 2);
-            foreach (byte b in hash) sb.Append(b.ToString("x2"));
+            foreach (byte b in hash) sb.Append(b.ToString("x2", null));
             return sb.ToString();
         }
 

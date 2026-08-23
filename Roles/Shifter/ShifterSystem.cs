@@ -349,12 +349,6 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
             return ids.ToArray();
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte playerId)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == playerId) return player;
-            return null;
-        }
 
         private static DateTime GetCooldown(byte shifterId) =>
             Cooldowns.TryGetValue(shifterId, out var value) ? value : DateTime.MinValue;

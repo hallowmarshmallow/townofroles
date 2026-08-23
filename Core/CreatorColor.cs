@@ -272,12 +272,6 @@ namespace TownOfUs.ManuAPI.Core
                 && string.Equals(playerName, legacyName, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte id)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == id) return player;
-            return null;
-        }
 
         // Same interop-drift-safe reflection used by PresentationPatches:
         // the runtime TextMeshPro/TextRenderer proxies expose "color" even

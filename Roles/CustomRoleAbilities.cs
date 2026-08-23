@@ -440,7 +440,7 @@ namespace TownOfUs.ManuAPI.Roles
             if (_renderer != null)
                 _renderer.color = ready ? Color.white : new Color(0.45f, 0.45f, 0.45f, 0.55f);
             if (_cooldownText != null)
-                _cooldownText.text = _cooldownRemaining > 0f ? Mathf.Ceil(_cooldownRemaining).ToString("0") : string.Empty;
+                _cooldownText.text = _cooldownRemaining > 0f ? Mathf.Ceil(_cooldownRemaining).ToString("0", null) : string.Empty;
             if (_abilityText != null) _abilityText.text = Name;
         }
 

@@ -341,7 +341,7 @@ namespace TownOfUs.ManuAPI.Core
             foreach (var comp in clone.GetComponentsInChildren<MonoBehaviour>(true))
             {
                 if (comp == null) continue;
-                if (comp.TryCast<TextMeshPro>() != null) continue;
+                if ((comp as TextMeshPro) != null) continue;
                 comp.enabled = false;
                 UnityEngine.Object.Destroy(comp);
             }
@@ -394,8 +394,8 @@ namespace TownOfUs.ManuAPI.Core
             foreach (var comp in clone.GetComponentsInChildren<MonoBehaviour>(true))
             {
                 if (comp == null) continue;
-                if (comp.TryCast<PassiveButton>() != null) continue;
-                if (comp.TryCast<TextMeshPro>() != null) continue;
+                if ((comp as PassiveButton) != null) continue;
+                if ((comp as TextMeshPro) != null) continue;
                 comp.enabled = false;
                 UnityEngine.Object.Destroy(comp);
             }
@@ -478,8 +478,8 @@ namespace TownOfUs.ManuAPI.Core
             foreach (var comp in clone.GetComponentsInChildren<MonoBehaviour>(true))
             {
                 if (comp == null) continue;
-                if (comp.TryCast<PassiveButton>() != null) continue;
-                if (comp.TryCast<TextMeshPro>() != null) continue;
+                if ((comp as PassiveButton) != null) continue;
+                if ((comp as TextMeshPro) != null) continue;
                 comp.enabled = false;
                 UnityEngine.Object.Destroy(comp);
             }

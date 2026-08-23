@@ -302,12 +302,6 @@ namespace TownOfUs.ManuAPI.Roles.Modifiers
             }
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte playerId)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == playerId) return player;
-            return null;
-        }
 
         // ── Lifecycle ────────────────────────────────────────────────────────
         public static void Reset()
@@ -380,12 +374,6 @@ namespace TownOfUs.ManuAPI.Roles.Modifiers
             }
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte id)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == id) return player;
-            return null;
-        }
     }
 
     // ── Drunk: inverted movement controls (local player only) ────────────────

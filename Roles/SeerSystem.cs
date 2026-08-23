@@ -70,7 +70,7 @@ namespace TownOfUs.ManuAPI.Roles.Seer
             {
                 if (RolePresentation.TryGet(target, out var name, out var color))
                     return (name, color);
-                var raw = target.Data.myRole.roleCodeName ?? target.Data.myRole.GetIl2CppType().Name;
+                var raw = target.Data.myRole.roleCodeName ?? target.Data.myRole.GetType().Name;
                 return (raw ?? "Unknown", Color.white);
             }
             switch (target.Data.myRole.RoleTeamType)

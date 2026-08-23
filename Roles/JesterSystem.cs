@@ -212,12 +212,6 @@ namespace TownOfUs.ManuAPI.Roles.Jester
 
         public static void ConsumePendingWin() => _jesterWon = false;
 
-        private static PlayerControl PlayerUtils.FindById(byte playerId)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == playerId) return player;
-            return null;
-        }
 
         public static bool IsJester(PlayerControl player) => RoleRegistry.IsAssigned(player, JesterRole.Id);
     }

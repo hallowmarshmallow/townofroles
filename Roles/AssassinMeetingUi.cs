@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
+using ClassicUs.ManuAPI;
 using TownOfUs.ManuAPI.Assets;
 using TownOfUs.ManuAPI.Core;
 
@@ -184,12 +185,6 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
             if (gameObject != null) UnityEngine.Object.Destroy(gameObject);
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte id)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == id) return player;
-            return null;
-        }
 
         private static void Local(string message)
         {

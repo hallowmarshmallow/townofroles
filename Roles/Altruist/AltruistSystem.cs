@@ -136,12 +136,6 @@ namespace TownOfUs.ManuAPI.Roles.Altruist
             }
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte playerId)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == playerId) return player;
-            return null;
-        }
 
         public static void Reset()
         {

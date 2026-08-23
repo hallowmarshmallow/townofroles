@@ -215,12 +215,6 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
             return null;
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte id)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == id) return player;
-            return null;
-        }
 
         private static byte GetClientId(byte playerId)
         {

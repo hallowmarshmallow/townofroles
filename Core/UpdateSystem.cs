@@ -187,7 +187,7 @@ namespace TownOfUs.ManuAPI.Core
             using var sha = SHA256.Create();
             byte[] hash = sha.ComputeHash(bytes);
             var sb = new StringBuilder(hash.Length * 2);
-            foreach (byte b in hash) sb.Append(b.ToString("x2"));
+            foreach (byte b in hash) sb.Append(b.ToString("x2", null));
             return sb.ToString();
         }
 

@@ -113,7 +113,6 @@ namespace TownOfUs.ManuAPI
             // warnings, unmodded-player detection, full-lobby-compat notice.
             // Must run after ReactorAPI.Register so the handshake carries this
             // mod's identity into the event dispatch.
-            ReactorNetworking.Install();
 
             // Per-role enable toggles (BepInEx/config/TownOfUs.ManuAPI.cfg).
             RoleConfig.Init(Config);
@@ -1592,7 +1591,6 @@ namespace TownOfUs.ManuAPI
             new Harmony(Guid + ".spy").UnpatchSelf();
 
             // ReactorNetworking cleanup (lobby mod-compat events).
-            ReactorNetworking.Uninstall();
 
             if (_harmonyHooksInstalled)
             {

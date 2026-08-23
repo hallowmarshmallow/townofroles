@@ -167,12 +167,6 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
             Recolor(morphling, ownColor);
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte playerId)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == playerId) return player;
-            return null;
-        }
 
         private static DateTime GetCooldown(byte morphlingId) =>
             Cooldowns.TryGetValue(morphlingId, out var value) ? value : DateTime.MinValue;

@@ -177,13 +177,9 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
                 foreach (var renderer in player.GetComponentsInChildren<Renderer>(true))
                 {
                     if (renderer == null) continue;
-                    var mats = renderer.materials;
-                    if (mats == null) continue;
-                    for (int i = 0; i < mats.Length; i++)
-                    {
-                        if (mats[i] == null) continue;
-                        mats[i].color = new Color(mats[i].color.r, mats[i].color.g, mats[i].color.b, 0.15f);
-                    }
+                    var mat = renderer.material;
+                    if (mat == null) continue;
+                    mat.color = new Color(mat.color.r, mat.color.g, mat.color.b, 0.15f);
                 }
             }
             catch { }
@@ -279,12 +275,6 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
         public static void OnGameStarted(GameStartedEventArgs _) => Reset();
         public static void OnGameEnded(GameEndedEventArgs _) { }
 
-        private static PlayerControl PlayerUtils.FindById(byte playerId)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == playerId) return player;
-            return null;
-        }
 
         private static void Local(string message)
         {

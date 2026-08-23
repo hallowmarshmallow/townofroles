@@ -145,12 +145,6 @@ namespace TownOfUs.ManuAPI.Roles.Undertaker
             Dragged.Remove(draggerId);
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte playerId)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == playerId) return player;
-            return null;
-        }
 
         private static DeadBody FindBody(byte parentId)
         {

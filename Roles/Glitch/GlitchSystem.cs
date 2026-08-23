@@ -487,12 +487,6 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             }
         }
 
-        private static PlayerControl PlayerUtils.FindById(byte playerId)
-        {
-            foreach (var player in PlayerControl.AllPlayerControls)
-                if (player != null && player.PlayerId == playerId) return player;
-            return null;
-        }
 
         private static DateTime GetCooldown(byte glitchId, Dictionary<byte, DateTime> table) =>
             table.TryGetValue(glitchId, out var value) ? value : DateTime.MinValue;
