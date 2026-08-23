@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using UnityEngine;
 using TownOfUs.ManuAPI.Core;
@@ -96,7 +96,7 @@ namespace TownOfUs.ManuAPI.Roles.Camouflager
             }
         }
 
-        [ManactorRpc(RequestRpc)]
+        [ReactorRpc(RequestRpc)]
         private static void OnRequest(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -113,7 +113,7 @@ namespace TownOfUs.ManuAPI.Roles.Camouflager
             }
         }
 
-        [ManactorRpc(StartRpc)]
+        [ReactorRpc(StartRpc)]
         private static void OnStart(byte senderId, float duration)
         {
             var client = AmongUsClient.Instance;

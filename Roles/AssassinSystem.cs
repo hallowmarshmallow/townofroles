@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using TownOfUs.ManuAPI.Core;
 
@@ -138,7 +138,7 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
                 : $"Wrong guess. The Assassin guessed {guess}; actual role was {actual}.");
         }
 
-        [ManactorRpc(RequestGuessRpc)]
+        [ReactorRpc(RequestGuessRpc)]
         private static void OnRequestGuess(byte senderId, byte assassinId, byte targetId, string guess)
         {
             var client = AmongUsClient.Instance;
@@ -150,7 +150,7 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
                 TryGuessTarget(assassin, target, canonical);
         }
 
-        [ManactorRpc(GuessResultRpc)]
+        [ReactorRpc(GuessResultRpc)]
         private static void OnGuessResult(byte senderId, byte assassinId, byte victimId, bool correct, byte targetId)
         {
             var client = AmongUsClient.Instance;

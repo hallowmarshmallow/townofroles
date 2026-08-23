@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using TownOfUs.ManuAPI.Core;
 
@@ -10,7 +10,7 @@ namespace TownOfUs.ManuAPI.Roles.Sheriff
     ///
     /// Ported from Town-Of-Us' Kill.cs / CantReport.cs:
     ///  - the kill itself goes through KillManager (host-authoritative, networked),
-    ///  - a companion Manactor RPC keeps every client's "who killed whom" table in sync,
+    ///  - a companion Reactor RPC keeps every client's "who killed whom" table in sync,
     ///    which is what the self-report suppression needs on non-host clients.
     /// </summary>
     internal static class SheriffSystem
@@ -90,7 +90,7 @@ namespace TownOfUs.ManuAPI.Roles.Sheriff
             TownOfUsRpcMux.Send(KilledRpc, victim, murderer);
         }
 
-        [ManactorRpc(KilledRpc)]
+        [ReactorRpc(KilledRpc)]
         private static void OnKilled(byte senderId, byte victim, byte murderer)
         {
             var client = AmongUsClient.Instance;
@@ -98,7 +98,7 @@ namespace TownOfUs.ManuAPI.Roles.Sheriff
             Record(victim, murderer);
         }
 
-        [ManactorRpc(RequestShootRpc)]
+        [ReactorRpc(RequestShootRpc)]
         private static void OnRequestShoot(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;

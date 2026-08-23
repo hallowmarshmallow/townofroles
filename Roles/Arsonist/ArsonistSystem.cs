@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
@@ -12,7 +12,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
     /// <summary>
     /// Arsonist gameplay logic (ported from Town-Of-Us' Arsonist.cs).
     ///
-    /// Douse marks the nearest player (synced over Manactor); Ignite kills every
+    /// Douse marks the nearest player (synced over Reactor); Ignite kills every
     /// doused player through KillManager. The Arsonist wins when every other
     /// living player is dead. Like the other neutrals it rides the vanilla
     /// Crewmate pool, converted host-side at round start.
@@ -230,7 +230,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
         }
 
         // ── RPCs ─────────────────────────────────────────────────────────────
-        [ManactorRpc(RequestDouseRpc)]
+        [ReactorRpc(RequestDouseRpc)]
         private static void OnRequestDouse(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -247,7 +247,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
             }
         }
 
-        [ManactorRpc(RequestIgniteRpc)]
+        [ReactorRpc(RequestIgniteRpc)]
         private static void OnRequestIgnite(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -264,7 +264,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
             }
         }
 
-        [ManactorRpc(DouseRpc)]
+        [ReactorRpc(DouseRpc)]
         private static void OnDouse(byte senderId, byte targetId)
         {
             var client = AmongUsClient.Instance;
@@ -272,7 +272,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
             Doused.Add(targetId);
         }
 
-        [ManactorRpc(AssignRpc)]
+        [ReactorRpc(AssignRpc)]
         private static void OnAssignRpc(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -287,7 +287,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
             _pendingRetries = 0;
         }
 
-        [ManactorRpc(IgniteRpc)]
+        [ReactorRpc(IgniteRpc)]
         private static void OnIgnite(byte senderId)
         {
             var client = AmongUsClient.Instance;
@@ -296,7 +296,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
             Local("The Arsonist ignited their doused targets!");
         }
 
-        [ManactorRpc(WinRpc)]
+        [ReactorRpc(WinRpc)]
         private static void OnWin(byte senderId)
         {
             var client = AmongUsClient.Instance;

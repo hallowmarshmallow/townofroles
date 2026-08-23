@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using UnityEngine;
 using TownOfUs.ManuAPI.Core;
@@ -95,7 +95,7 @@ namespace TownOfUs.ManuAPI.Roles.Swooper
             catch { }
         }
 
-        [ManactorRpc(RequestRpc)]
+        [ReactorRpc(RequestRpc)]
         private static void OnRequest(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -112,7 +112,7 @@ namespace TownOfUs.ManuAPI.Roles.Swooper
             }
         }
 
-        [ManactorRpc(StartRpc)]
+        [ReactorRpc(StartRpc)]
         private static void OnStart(byte senderId, byte swooperId, float duration)
         {
             var client = AmongUsClient.Instance;

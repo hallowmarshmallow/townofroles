@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
@@ -12,7 +12,7 @@ namespace TownOfUs.ManuAPI.Roles.Spy
     /// Spy gameplay logic (ported from Town-Of-Us' Spy.cs).
     ///
     /// The host watches every player's inVent flag (throttled) and notifies the
-    /// Spies over a Manactor RPC when someone enters or leaves a vent, and when
+    /// Spies over a Reactor RPC when someone enters or leaves a vent, and when
     /// the Arsonist douses a player. Spies see the intel as chat warnings —
     /// matching the original role's information advantage without a map overlay.
     /// </summary>
@@ -80,7 +80,7 @@ namespace TownOfUs.ManuAPI.Roles.Spy
             ShowIntel(kind);
         }
 
-        [ManactorRpc(IntelRpc)]
+        [ReactorRpc(IntelRpc)]
         private static void OnIntel(byte senderId, byte kind, byte playerId)
         {
             var client = AmongUsClient.Instance;

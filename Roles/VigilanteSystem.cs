@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using TownOfUs.ManuAPI.Core;
 
@@ -65,7 +65,7 @@ namespace TownOfUs.ManuAPI.Roles.Vigilante
         public static void OnGameStarted(GameStartedEventArgs _) => Reset();
         public static void OnGameEnded(GameEndedEventArgs _) => Reset();
 
-        [ManactorRpc(RequestShotRpc)]
+        [ReactorRpc(RequestShotRpc)]
         private static void OnRequestShotRpc(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -82,7 +82,7 @@ namespace TownOfUs.ManuAPI.Roles.Vigilante
             }
         }
 
-        [ManactorRpc(ShotRpc)]
+        [ReactorRpc(ShotRpc)]
         private static void OnShotRpc(byte senderId, byte vigilanteId, byte playerId, bool enemy, int shotsRemaining)
         {
             var client = AmongUsClient.Instance;

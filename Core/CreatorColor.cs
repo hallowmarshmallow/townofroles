@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BepInEx.Configuration;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
@@ -86,7 +86,7 @@ namespace TownOfUs.ManuAPI.Core
             _claimedPlayerId = -1;
         }
 
-        [ManactorRpc(CreatorClaimRpc)]
+        [ReactorRpc(CreatorClaimRpc)]
         private static void OnCreatorClaimRpc(byte senderId, string secret)
         {
             var expected = Secret?.Value;

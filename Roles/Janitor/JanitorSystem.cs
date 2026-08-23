@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using TownOfUs.ManuAPI.Core;
 using UnityEngine;
@@ -81,7 +81,7 @@ namespace TownOfUs.ManuAPI.Roles.Janitor
             UnityEngine.Object.Destroy(body.gameObject);
         }
 
-        [ManactorRpc(RequestCleanRpc)]
+        [ReactorRpc(RequestCleanRpc)]
         private static void OnRequestClean(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -98,7 +98,7 @@ namespace TownOfUs.ManuAPI.Roles.Janitor
             }
         }
 
-        [ManactorRpc(CleanRpc)]
+        [ReactorRpc(CleanRpc)]
         private static void OnClean(byte senderId, byte parentId)
         {
             var client = AmongUsClient.Instance;

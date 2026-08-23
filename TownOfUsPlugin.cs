@@ -1,7 +1,7 @@
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using TownOfUs.ManuAPI.Core;
@@ -40,15 +40,15 @@ namespace TownOfUs.ManuAPI
 {
     /// <summary>
     /// Town Of Us for Classic Us — a port of the classic Town-Of-Us role mod onto the
-    /// ManuAPI + Manactor framework.
+    /// ManuAPI + Reactor framework.
     ///
     /// Skeleton status: the Sheriff (crewmate) is the worked example and demonstrates the
     /// full pattern — a virtual role descriptor, a CustomAbility button, host-authoritative
-    /// kills through KillManager, a companion Manactor RPC for cross-client state, and a
+    /// kills through KillManager, a companion Reactor RPC for cross-client state, and a
     /// GameEvents hook (self-report suppression).
     /// </summary>
     [BepInPlugin(Guid, "Town Of Us", Version)]
-    [BepInDependency(ManactorPlugin.Guid)]
+    [BepInDependency(ReactorPlugin.Guid)]
     [BepInDependency(ManuAPIPlugin.Guid)]
     public sealed class TownOfUsPlugin : BasePlugin
     {
@@ -105,9 +105,15 @@ namespace TownOfUs.ManuAPI
                 }
             };
 
-            // Tell Manactor this mod is present (mod list only; the handshake /
-            // mod-set verification system was removed from Manactor).
-            ManactorAPI.Register("TownOfUs.ManuAPI", Version);
+            // Tell Reactor this mod is present (mod list only; the handshake /
+            // mod-set verification system was removed from Reactor).
+            ReactorAPI.Register("TownOfUs.ManuAPI", Version);
+
+            // Wire Reactor's lobby-mod-compatibility events: version mismatch
+            // warnings, unmodded-player detection, full-lobby-compat notice.
+            // Must run after ReactorAPI.Register so the handshake carries this
+            // mod's identity into the event dispatch.
+            ReactorNetworking.Install();
 
             // Per-role enable toggles (BepInEx/config/TownOfUs.ManuAPI.cfg).
             RoleConfig.Init(Config);
@@ -117,10 +123,10 @@ namespace TownOfUs.ManuAPI
             UpdateConfig.Init(Config);
 
             // CRASH DIAGNOSTIC (Diagnostics.DisableAllPatches = true): load the
-            // mod inert - registered with Manactor, config read, but no Harmony
+            // mod inert - registered with Reactor, config read, but no Harmony
             // patches, no game events, no RPC registration, no role descriptors.
             // If the game still crashes in this mode, the fault is in load-time
-            // code or a ManuAPI/Manactor interaction, not in any patch.
+            // code or a ManuAPI/Reactor interaction, not in any patch.
             if (RoleConfig.DisableAllPatches?.Value == true)
             {
                 Log.LogWarning("DisableAllPatches = true - running INERT (no patches/events/RPC). Use to bisect startup crashes.");
@@ -128,20 +134,20 @@ namespace TownOfUs.ManuAPI
                 return;
             }
 
-            // Manactor 1.2 reserves only 39 custom RPC ids (212-250). This mod
+            // Reactor 1.2 reserves only 39 custom RPC ids (212-250). This mod
             // has ~68 RPC keys, so registering them all directly overflows the
             // allocator: keys past "Miner..." get no id, GetId() returns 0, and
-            // ManactorRpc.Send(0, args) writes a Hazel message tagged callId 0 -
+            // ReactorRpc.Send(0, args) writes a Hazel message tagged callId 0 -
             // a vanilla RPC the native game parses with its own handler, which
             // segfaults the process on game start / join. The mux routes every
             // role key through one reserved transport id instead. Must run before
             // the first RegisterRpcMethods below so every role type is captured.
-            // Manactor 1.4 serializes byte[] RPC arguments as a length-prefixed
+            // Reactor 1.4 serializes byte[] RPC arguments as a length-prefixed
             // payload, which is the transport contract used by TownOfUsRpcMux.
             // Install before any role system registers its handlers; otherwise
             // surplus role keys consume the finite native RPC-id range first.
             // Install the RPC multiplexer FIRST, before any role type registers
-            // its [ManactorRpc] handlers below. Manactor only has 39 native custom
+            // its [ReactorRpc] handlers below. Reactor only has 39 native custom
             // RPC ids (212-250) while this mod has ~68 keys, so the mux captures
             // every townofus.* key and routes it through one reserved transport id.
             // This is the pattern of the builds that ran clean (single
@@ -152,6 +158,9 @@ namespace TownOfUs.ManuAPI
             {
                 TownOfUsRpcMux.Install();
                 Log.LogInfo("TownOfUs RPC mux: installed (single transport for all role keys)");
+                // Reset mux handler statistics every game so per-match
+                // diagnostics don't accumulate stale counters.
+                GameEvents.GameEnded += _ => TownOfUsRpcMux.ResetStats();
             }
             catch (Exception ex)
             {

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using UnityEngine;
 using TownOfUs.ManuAPI.Core;
@@ -112,7 +112,7 @@ namespace TownOfUs.ManuAPI.Roles.Undertaker
             return best;
         }
 
-        [ManactorRpc(RequestDragRpc)]
+        [ReactorRpc(RequestDragRpc)]
         private static void OnRequestDrag(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -129,7 +129,7 @@ namespace TownOfUs.ManuAPI.Roles.Undertaker
             }
         }
 
-        [ManactorRpc(DragRpc)]
+        [ReactorRpc(DragRpc)]
         private static void OnDrag(byte senderId, byte draggerId, byte bodyParentId)
         {
             var client = AmongUsClient.Instance;
@@ -137,7 +137,7 @@ namespace TownOfUs.ManuAPI.Roles.Undertaker
             Dragged[draggerId] = bodyParentId;
         }
 
-        [ManactorRpc(DropRpc)]
+        [ReactorRpc(DropRpc)]
         private static void OnDrop(byte senderId, byte draggerId)
         {
             var client = AmongUsClient.Instance;

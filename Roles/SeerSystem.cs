@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using UnityEngine;
 using TownOfUs.ManuAPI.Core;
@@ -107,7 +107,7 @@ namespace TownOfUs.ManuAPI.Roles.Seer
         public static void OnGameStarted(GameStartedEventArgs _) => Reset();
         public static void OnGameEnded(GameEndedEventArgs _) => Reset();
 
-        [ManactorRpc(RequestInvestigateRpc)]
+        [ReactorRpc(RequestInvestigateRpc)]
         private static void OnRequestInvestigateRpc(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -124,7 +124,7 @@ namespace TownOfUs.ManuAPI.Roles.Seer
             }
         }
 
-        [ManactorRpc(InvestigateRpc)]
+        [ReactorRpc(InvestigateRpc)]
         private static void OnInvestigateRpc(byte senderId, byte seerPlayerId, byte targetPlayerId, string result, int usesRemaining)
         {
             var client = AmongUsClient.Instance;

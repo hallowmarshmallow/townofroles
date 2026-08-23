@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
@@ -20,7 +20,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
     /// The host is authoritative: it resolves the swap, reassigns roles through
     /// RoleManager (virtual roles), swaps task type ids through GameData.RpcSetTasks
     /// (the game's own broadcast), and mirrors the role reassignment to every
-    /// client over Manactor so all registries agree.
+    /// client over Reactor so all registries agree.
     /// </summary>
     internal static class ShifterSystem
     {
@@ -233,7 +233,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
             RoleRegistry.IsAssigned(player, TownOfUs.ManuAPI.Roles.Arsonist.ArsonistRole.Id);
 
         // ── RPCs ─────────────────────────────────────────────────────────────
-        [ManactorRpc(RequestShiftRpc)]
+        [ReactorRpc(RequestShiftRpc)]
         private static void OnRequestShift(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -250,7 +250,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
             }
         }
 
-        [ManactorRpc(SwapRpc)]
+        [ReactorRpc(SwapRpc)]
         private static void OnSwap(byte senderId, byte shifterId, byte targetId, string targetRoleId)
         {
             var client = AmongUsClient.Instance;
@@ -272,7 +272,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
             }
         }
 
-        [ManactorRpc(SuicideRpc)]
+        [ReactorRpc(SuicideRpc)]
         private static void OnSuicide(byte senderId, byte shifterId)
         {
             var client = AmongUsClient.Instance;
@@ -284,7 +284,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
                 Local("You tried to shift an Impostor and died.");
         }
 
-        [ManactorRpc(AssignRpc)]
+        [ReactorRpc(AssignRpc)]
         private static void OnAssignRpc(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;

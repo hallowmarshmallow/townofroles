@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using TownOfUs.ManuAPI.Assets;
 using TownOfUs.ManuAPI.Core;
@@ -92,7 +92,7 @@ namespace TownOfUs.ManuAPI.Roles.Medic
         public static void OnGameStarted(GameStartedEventArgs _) => Reset();
         public static void OnGameEnded(GameEndedEventArgs _) => Reset();
 
-        [ManactorRpc(RequestProtectRpc)]
+        [ReactorRpc(RequestProtectRpc)]
         private static void OnRequestProtectRpc(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -109,7 +109,7 @@ namespace TownOfUs.ManuAPI.Roles.Medic
             }
         }
 
-        [ManactorRpc(ShieldRpc)]
+        [ReactorRpc(ShieldRpc)]
         private static void OnShieldRpc(byte senderId, byte medicId, byte targetId, int usesRemaining)
         {
             var client = AmongUsClient.Instance;

@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="ClassicUs.GameLibs" Version="2026.8.16.1" PrivateAssets="all" />
-    <PackageReference Include="ClassicUs.Manactor" Version="1.1.0" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="ClassicUs.Reactor" Version="1.1.0" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="ClassicUs.ManuAPI" Version="1.5.1" PrivateAssets="all" ExcludeAssets="runtime" />
   </ItemGroup>
 

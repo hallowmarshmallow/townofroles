@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using BepInEx.Configuration;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using InnerNet;
 
@@ -14,7 +14,7 @@ namespace TownOfUs.ManuAPI.Core
     ///
     /// Every exposed setting is a named "channel" bound to one RoleConfig entry.
     /// The host edits channels (which write RoleConfig + save). On any change, game
-    /// start, or player join the host broadcasts the full value set over a Manactor
+    /// start, or player join the host broadcasts the full value set over a Reactor
     /// RPC as a packed "name=value;..." string; clients mirror the received values
     /// back into their own RoleConfig entries, so descriptors, abilities, and the
     /// UI all read identical values on every client.
@@ -239,7 +239,7 @@ namespace TownOfUs.ManuAPI.Core
         public static void HostBroadcast()
         {
             if (!CanEdit) return;
-            // Only meaningful in a real networked lobby. In Freeplay the Manactor
+            // Only meaningful in a real networked lobby. In Freeplay the Reactor
             // handshake never finalizes, so SendRpcMethod spams the log with
             // "'townofus.RoleSettings' was never reserved" on every join.
             var client = AmongUsClient.Instance;
@@ -250,7 +250,7 @@ namespace TownOfUs.ManuAPI.Core
             catch (Exception e) { Log("broadcast: " + e.Message); }
         }
 
-        [ManactorRpc(RpcKey)]
+        [ReactorRpc(RpcKey)]
         private static void Receive(byte senderId, string payload)
         {
             var client = AmongUsClient.Instance;

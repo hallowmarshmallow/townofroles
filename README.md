@@ -7,7 +7,7 @@ A port of the classic, deprecated **Town-Of-Us** Among Us role mod onto the mode
 ```
 Classic Us (game, DlovanSl)
    └─ BepInEx (IL2CPP)
-        └─ ClassicUs.Manactor (networking / handshake / RPCs)
+        └─ ClassicUs.Reactor (networking / handshake / RPCs)
              └─ ClassicUs.ManuAPI (roles, abilities, kills, settings UI)
                   └─ TownOfUs.ManuAPI (this mod)
 ```
@@ -61,7 +61,7 @@ During development you can also copy the DLL automatically after every build by 
 dotnet build -c Release -p:ClassicUsGameDir="C:\Path\To\ClassicUs"
 ```
 
-Either way the mod needs **ManuAPI 1.5.2** and **Manactor 1.1.0** in the same
+Either way the mod needs **ManuAPI 1.5.2** and **Reactor 1.1.0** in the same
 `BepInEx/plugins` folder (both are included in the zips). The Linux package uses
 DLLs rebuilt against the Linux 8.9 `GameAssembly.so`; the Windows package uses
 DLLs rebuilt against the Windows 8.9 `GameAssembly.dll`. ManuAPI 1.5.2 is the
@@ -183,7 +183,7 @@ operation. `/setrole Jester` assigns the toggleable Jester for testing; the curr
 host must have `Jester = true` in `[Neutral Roles]`.
 When the Jester is exiled by a meeting vote, the host ends the match through
 `ShipStatus.StartEndGame(GameOverReason.Custom, ...)`; the result screen is
-changed to **Jester Wins** on every client through an authenticated Manactor
+changed to **Jester Wins** on every client through an authenticated Reactor
 host event. With no target it revives the local host; with a player name or ID it
 revives that player. `/tpin` and `/tpout` use the current map's native spawn locations as the
 inside/outside dropship positions. They are intended for lobby/freeplay testing;
@@ -206,7 +206,7 @@ Enabled = false
 | Area | Status |
 |---|---|
 | Project scaffolding (builds against real 8.9 interop + ManuAPI 1.5.2 rebuilt for 8.9) | ✅ |
-| **Sheriff** (Crewmate) — worked example | ✅ native Kill button, correct/wrong-target kill logic, suicide on miss, self-report suppression, cross-client kill tracking via `[ManactorRpc]`, config toggle |
+| **Sheriff** (Crewmate) — worked example | ✅ native Kill button, correct/wrong-target kill logic, suicide on miss, self-report suppression, cross-client kill tracking via `[ReactorRpc]`, config toggle |
 | **Engineer** (Crewmate) — native vent + Fix Sab slice | ✅ virtual role, Freeplay computer selection, native vent permission/networking, native Fix Sab button, config toggle; ⏳ classic vent cooldown/limited-time/repair extras |
 | **Medic** (Crewmate) — one-use shield | ✅ host-authoritative shield RPC, murder cancellation, toggle, original Town Of Us Medic art embedded |
 | **Seer** (Crewmate) — one-use faction investigation | ✅ host-authoritative investigation RPC, result delivery, toggle, original Town Of Us Seer art embedded |
@@ -253,7 +253,7 @@ stub; if it breaks silently at runtime, re-run the interop diff from `PORTING.md
 ## Project layout
 
 ```
-TownOfUs.ManuAPI.csproj     # net6.0; refs GameLibs/Manactor/ManuAPI (+ local repack)
+TownOfUs.ManuAPI.csproj     # net6.0; refs GameLibs/Reactor/ManuAPI (+ local repack)
 TownOfUsPlugin.cs           # BepInEx entry: registers mod, RPCs, roles, GameEvents hooks
 Core/
   ClosestPlayerFinder.cs    # shared nearest-target-in-kill-range helper
@@ -312,5 +312,5 @@ is not loaded by the current role buttons. No replacement or AI-generated art is
 ## Credits
 
 - **ClassicUs** game — DlovanSl
-- **ManuAPI / Manactor** — TechDevOfficial (source: `github.com/TechDevOfficial/ClassicUs.ManuAPI`, `.../ClassicUs.Manactor`)
+- **ManuAPI / Reactor** — TechDevOfficial (source: `github.com/TechDevOfficial/ClassicUs.ManuAPI`, `.../ClassicUs.Reactor`)
 - **Town Of Us** (original) — slushiegoose et al. (archived: `github.com/slushiegoose/Town-Of-Us`)

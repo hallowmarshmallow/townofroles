@@ -1,5 +1,5 @@
 using System;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
@@ -135,7 +135,7 @@ namespace TownOfUs.ManuAPI.Roles.Jester
             ShipStatus.Instance.StartEndGame(GameOverReason.Custom, 0.5f);
         }
 
-        [ManactorRpc(JesterAssignRpc)]
+        [ReactorRpc(JesterAssignRpc)]
         private static void OnJesterAssignRpc(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -180,7 +180,7 @@ namespace TownOfUs.ManuAPI.Roles.Jester
             catch { }
         }
 
-        [ManactorRpc(JesterWinRpc)]
+        [ReactorRpc(JesterWinRpc)]
         private static void OnJesterWinRpc(byte senderId)
         {
             var client = AmongUsClient.Instance;

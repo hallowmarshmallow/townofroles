@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
@@ -208,7 +208,7 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
             RoleRegistry.IsAssigned(player, TownOfUs.ManuAPI.Roles.Executioner.ExecutionerRole.Id) ||
             RoleRegistry.IsAssigned(player, TownOfUs.ManuAPI.Roles.Arsonist.ArsonistRole.Id);
 
-        [ManactorRpc(AssignRpc)]
+        [ReactorRpc(AssignRpc)]
         private static void OnAssignRpc(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -223,7 +223,7 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
             _pendingRetries = 0;
         }
 
-        [ManactorRpc(DeathRpc)]
+        [ReactorRpc(DeathRpc)]
         private static void OnDeath(byte senderId, byte phantomId)
         {
             var client = AmongUsClient.Instance;
@@ -232,7 +232,7 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
             Fade(FindPlayer(phantomId));
         }
 
-        [ManactorRpc(WinRpc)]
+        [ReactorRpc(WinRpc)]
         private static void OnWin(byte senderId)
         {
             var client = AmongUsClient.Instance;

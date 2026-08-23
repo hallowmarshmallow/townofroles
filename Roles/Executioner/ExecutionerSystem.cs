@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
@@ -15,7 +15,7 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
     /// host converts a random unclaimed Crewmate into the Executioner and
     /// picks a secret target (any other living non-Impostor). When that
     /// target is voted out, the Executioner wins. Target assignment is synced
-    /// over Manactor so every client agrees on who is whose target.
+    /// over Reactor so every client agrees on who is whose target.
     /// </summary>
     internal static class ExecutionerSystem
     {
@@ -277,7 +277,7 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
                 NotifyConverted(executioner, mode);
         }
 
-        [ManactorRpc(ConvertRpc)]
+        [ReactorRpc(ConvertRpc)]
         private static void OnConvertRpc(byte senderId, byte executionerId, string mode)
         {
             var client = AmongUsClient.Instance;
@@ -307,7 +307,7 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
             catch { }
         }
 
-        [ManactorRpc(AssignRpc)]
+        [ReactorRpc(AssignRpc)]
         private static void OnAssignRpc(byte senderId, byte executionerId, byte targetId)
         {
             var client = AmongUsClient.Instance;
@@ -325,7 +325,7 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
             _pendingRetries = 0;
         }
 
-        [ManactorRpc(WinRpc)]
+        [ReactorRpc(WinRpc)]
         private static void OnWinRpc(byte senderId, byte executionerId, byte targetId)
         {
             var client = AmongUsClient.Instance;

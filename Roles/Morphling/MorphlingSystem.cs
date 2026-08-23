@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
@@ -128,7 +128,7 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
             }
         }
 
-        [ManactorRpc(RequestMorphRpc)]
+        [ReactorRpc(RequestMorphRpc)]
         private static void OnRequestMorph(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -145,7 +145,7 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
             }
         }
 
-        [ManactorRpc(MorphRpc)]
+        [ReactorRpc(MorphRpc)]
         private static void OnMorph(byte senderId, byte morphlingId, string targetName, int targetColor)
         {
             var client = AmongUsClient.Instance;
@@ -157,7 +157,7 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
             Recolor(morphling, targetColor);
         }
 
-        [ManactorRpc(RevertRpc)]
+        [ReactorRpc(RevertRpc)]
         private static void OnRevert(byte senderId, byte morphlingId, string ownName, int ownColor)
         {
             var client = AmongUsClient.Instance;

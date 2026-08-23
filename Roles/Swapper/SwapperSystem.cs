@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
@@ -14,7 +14,7 @@ namespace TownOfUs.ManuAPI.Roles.Swapper
     /// Votes cast for either of the two are counted for the other: the host's
     /// vote tally is a byte[] indexed by the voted player, so swapping the two
     /// tally entries reproduces the effect exactly. Selections are synced from
-    /// non-host Swappers via a Manactor request RPC.
+    /// non-host Swappers via a Reactor request RPC.
     /// </summary>
     internal static class SwapperSystem
     {
@@ -53,7 +53,7 @@ namespace TownOfUs.ManuAPI.Roles.Swapper
         public static void OnMeetingStarted(MeetingEventArgs _) => Reset();
         public static void OnMeetingEnded(MeetingEventArgs _) => Reset();
 
-        [ManactorRpc(RequestSwapRpc)]
+        [ReactorRpc(RequestSwapRpc)]
         private static void OnRequestSwap(byte senderId, byte swapperId, byte a, byte b)
         {
             var client = AmongUsClient.Instance;
@@ -70,7 +70,7 @@ namespace TownOfUs.ManuAPI.Roles.Swapper
             }
         }
 
-        [ManactorRpc(SwapRpc)]
+        [ReactorRpc(SwapRpc)]
         private static void OnSwap(byte senderId, byte swapperId, byte a, byte b)
         {
             var client = AmongUsClient.Instance;

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build the managed stack against the native Classic Us Linux 8.9 interop.
+# Build the managed stack against the native Classic Us Linux 8.16 interop.
 # This intentionally uses packages/linux and a separate NuGet cache so the
 # Windows-generated interop/package remains untouched.
 set -euo pipefail
@@ -14,16 +14,16 @@ VERSION=1.5.2
 
 [ -d "$SRC" ] || { echo "ERROR: ManuAPI source not found at $SRC"; exit 1; }
 [ -f "$LINUX_INTEROP" ] || { echo "ERROR: Linux interop not found at $LINUX_INTEROP"; exit 1; }
-[ -f "$ROOT/packages/classicus.gamelibs.2026.7.11.1.nupkg" ] || { echo "ERROR: Windows GameLibs package is missing"; exit 1; }
+[ -f "$ROOT/packages/classicus.gamelibs.2026.8.16.1.nupkg" ] || { echo "ERROR: Windows GameLibs package is missing"; exit 1; }
 [ -f "$ROOT/packages/classicus.manuapi.1.5.2.nupkg" ] || { echo "ERROR: fixed ManuAPI 1.5.2 package is missing"; exit 1; }
 
 mkdir -p "$FEED"
-cp "$ROOT/packages/classicus.gamelibs.2026.7.11.1.nupkg" "$FEED/classicus.gamelibs.2026.7.11.1.nupkg"
-python3 "$ROOT/tools/update_gamelibs.py" "$FEED/classicus.gamelibs.2026.7.11.1.nupkg" "$LINUX_INTEROP"
+cp "$ROOT/packages/classicus.gamelibs.2026.8.16.1.nupkg" "$FEED/classicus.gamelibs.2026.8.16.1.nupkg"
+python3 "$ROOT/tools/update_gamelibs.py" "$FEED/classicus.gamelibs.2026.8.16.1.nupkg" "$LINUX_INTEROP"
 
-MANACTOR_SOURCE="$HOME/.nuget/packages/classicus.manactor/1.1.0/classicus.manactor.1.1.0.nupkg"
-[ -f "$MANACTOR_SOURCE" ] || { echo "ERROR: restore/cache ClassicUs.Manactor 1.1.0 first"; exit 1; }
-cp "$MANACTOR_SOURCE" "$FEED/classicus.manactor.1.1.0.nupkg"
+REACTOR_SOURCE="$HOME/.nuget/packages/classicus.reactor/1.1.0/classicus.reactor.1.1.0.nupkg"
+[ -f "$REACTOR_SOURCE" ] || { echo "ERROR: restore/cache ClassicUs.Reactor 1.1.0 first"; exit 1; }
+cp "$REACTOR_SOURCE" "$FEED/classicus.reactor.1.1.0.nupkg"
 
 rm -rf "$BUILD"
 cp -r "$SRC" "$BUILD"

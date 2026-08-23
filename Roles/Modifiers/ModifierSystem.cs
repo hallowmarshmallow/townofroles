@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
@@ -232,7 +232,7 @@ namespace TownOfUs.ManuAPI.Roles.Modifiers
             }
         }
 
-        [ManactorRpc(AssignRpc)]
+        [ReactorRpc(AssignRpc)]
         private static void OnAssign(byte senderId, string payload)
         {
             var client = AmongUsClient.Instance;

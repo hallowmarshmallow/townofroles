@@ -2,7 +2,7 @@
 """Build drop-in install zips for TownOfUs.ManuAPI.
 
 Default target is Windows. Set TOU_PLATFORM=linux for the native Linux
-archive. Set SKIP_TOWN_OF_US=1 to make a ManuAPI/Manactor-only diagnostic zip.
+archive. Set SKIP_TOWN_OF_US=1 to make a ManuAPI/Reactor-only diagnostic zip.
 """
 import os
 import shutil
@@ -56,11 +56,11 @@ MANUAPI_PKG = os.environ.get(
     if IS_LINUX
     else os.path.join(ROOT, "packages", "ClassicUs.ManuAPI.1.7.1.nupkg"),
 )
-MANACTOR_PKG = os.environ.get(
-    "MANACTOR_PKG",
-    os.path.join(ROOT, "packages", "linux", "classicus.manactor.1.1.0.nupkg")
+REACTOR_PKG = os.environ.get(
+    "REACTOR_PKG",
+    os.path.join(ROOT, "packages", "linux", "classicus.reactor.1.1.0.nupkg")
     if IS_LINUX
-    else os.path.join(ROOT, "packages", "ClassicUs.Manactor.1.2.0.nupkg"),
+    else os.path.join(ROOT, "packages", "ClassicUs.Reactor.1.2.0.nupkg"),
 )
 MOD_DLL = os.environ.get(
     "MOD_DLL",
@@ -106,7 +106,7 @@ the game executable).
 Contents:
 {_loader_contents_line}  BepInEx/plugins/TownOfUs.ManuAPI.dll          Town Of Us mod with configurable role settings
   BepInEx/plugins/ClassicUs.ManuAPI.dll         ManuAPI 1.7.1
-  BepInEx/plugins/ClassicUs.Manactor.dll        Manactor 1.2.0
+  BepInEx/plugins/ClassicUs.Reactor.dll        Reactor 1.2.0
   BepInEx/patchers/TownOfUs.Updater.Patcher.dll Self-update applier (applies staged updates on launch)
 
 {'Linux launch:' if IS_LINUX else 'Launch:'}
@@ -242,8 +242,8 @@ def main():
         "Build/restore the platform-specific ManuAPI package first (Linux: tools/build_linux.sh).",
     )
     _check(
-        MANACTOR_PKG,
-        "Restore/copy the platform-specific ClassicUs.Manactor 1.1.0 package first.",
+        REACTOR_PKG,
+        "Restore/copy the platform-specific ClassicUs.Reactor 1.1.0 package first.",
     )
 
     if os.path.exists(STAGE):
@@ -274,7 +274,7 @@ def main():
         MANUAPI_PKG, "lib/net6.0/ClassicUs.ManuAPI.dll", PLUGINS
     )
     _extract_runtime_dll(
-        MANACTOR_PKG, "lib/net6.0/ClassicUs.Manactor.dll", PLUGINS
+        REACTOR_PKG, "lib/net6.0/ClassicUs.Reactor.dll", PLUGINS
     )
     shutil.rmtree(os.path.join(STAGE, "lib"), ignore_errors=True)
 
@@ -293,7 +293,7 @@ def main():
     # 5. Plugins-only zip: for installs that already have BepInEx.
     plugins_stage = os.path.join(STAGE, "plugins-only")
     os.makedirs(os.path.join(plugins_stage, "BepInEx", "plugins"))
-    mod_names = ["ClassicUs.ManuAPI.dll", "ClassicUs.Manactor.dll"]
+    mod_names = ["ClassicUs.ManuAPI.dll", "ClassicUs.Reactor.dll"]
     if not SKIP_TOWN_OF_US:
         mod_names.insert(0, "TownOfUs.ManuAPI.dll")
     for name in mod_names:

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using UnityEngine;
 using TownOfUs.ManuAPI.Core;
@@ -100,7 +100,7 @@ namespace TownOfUs.ManuAPI.Roles.TimeLord
             }
         }
 
-        [ManactorRpc(RequestRewindRpc)]
+        [ReactorRpc(RequestRewindRpc)]
         private static void OnRequestRewind(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;

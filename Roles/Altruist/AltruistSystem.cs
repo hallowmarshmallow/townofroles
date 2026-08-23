@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using TownOfUs.ManuAPI.Core;
 using UnityEngine;
@@ -101,7 +101,7 @@ namespace TownOfUs.ManuAPI.Roles.Altruist
         private static DateTime GetCooldown(byte altruistId) =>
             Cooldowns.TryGetValue(altruistId, out var value) ? value : DateTime.MinValue;
 
-        [ManactorRpc(RequestReviveRpc)]
+        [ReactorRpc(RequestReviveRpc)]
         private static void OnRequestRevive(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -118,7 +118,7 @@ namespace TownOfUs.ManuAPI.Roles.Altruist
             }
         }
 
-        [ManactorRpc(ReviveRpc)]
+        [ReactorRpc(ReviveRpc)]
         private static void OnRevive(byte senderId, byte altruistId, byte revivedId, int usesRemaining)
         {
             var client = AmongUsClient.Instance;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using UnityEngine;
 using TownOfUs.ManuAPI.Core;
@@ -161,7 +161,7 @@ namespace TownOfUs.ManuAPI.Commands
             return true;
         }
 
-        [ManactorRpc(RequestCustomCommandRpc)]
+        [ReactorRpc(RequestCustomCommandRpc)]
         private static void OnRequestCustomCommandRpc(byte senderId, string command, string args)
         {
             var client = AmongUsClient.Instance;
@@ -180,7 +180,7 @@ namespace TownOfUs.ManuAPI.Commands
             TownOfUsRpcMux.Send(CustomCommandRpc, message);
         }
 
-        [ManactorRpc(CustomCommandRpc)]
+        [ReactorRpc(CustomCommandRpc)]
         private static void OnCustomCommandRpc(byte senderId, string message)
         {
             // The host already displayed the message when it broadcast it; only
@@ -354,7 +354,7 @@ namespace TownOfUs.ManuAPI.Commands
             Local($"Revived {DisplayName(target)}.");
         }
 
-        [ManactorRpc(ReviveRpc)]
+        [ReactorRpc(ReviveRpc)]
         private static void OnReviveRpc(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -570,7 +570,7 @@ namespace TownOfUs.ManuAPI.Commands
             catch (Exception e) { Warn("Lobby broadcast failed: " + e.Message); }
         }
 
-        [ManactorRpc(SystemMessageRpc)]
+        [ReactorRpc(SystemMessageRpc)]
         private static void OnSystemMessageRpc(byte senderId, string message)
         {
             // The host already displayed the message when it broadcast it; only

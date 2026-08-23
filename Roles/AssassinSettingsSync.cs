@@ -1,4 +1,4 @@
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using TownOfUs.ManuAPI.Core;
 
@@ -38,7 +38,7 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
             TownOfUsRpcMux.Send(RpcKey, ActiveEnabled, (byte)ActiveCount, ActiveChance, ActiveMultiKill, ActiveMeetingUi);
         }
 
-        [ManactorRpc(RpcKey)]
+        [ReactorRpc(RpcKey)]
         private static void Receive(byte senderId, bool enabled, byte count, float chance, bool multiKill, bool meetingUi)
         {
             var client = AmongUsClient.Instance;

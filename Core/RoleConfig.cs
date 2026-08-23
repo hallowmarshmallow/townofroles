@@ -333,7 +333,7 @@ namespace TownOfUs.ManuAPI.Core
                 "The custom lobby code to show (1-6 letters/digits, e.g. YOUSEF or MARSHY). Leave empty to disable.");
             DisableAllPatches = config.Bind(
                 "Diagnostics", "DisableAllPatches", false,
-                "CRASH DIAGNOSTIC: load the mod completely inert - register with Manactor and read config, but install NO Harmony patches, subscribe to NO game events, and register NO RPC handlers. Use to bisect startup crashes: true = game should launch (roles are inert); false = normal behavior.");
+                "CRASH DIAGNOSTIC: load the mod completely inert - register with Reactor and read config, but install NO Harmony patches, subscribe to NO game events, and register NO RPC handlers. Use to bisect startup crashes: true = game should launch (roles are inert); false = normal behavior.");
 
             MigrateLegacyEntries(config, fileValues);
         }

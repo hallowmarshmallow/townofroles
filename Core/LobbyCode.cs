@@ -1,6 +1,6 @@
 using System;
 using BepInEx.Logging;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using InnerNet;
@@ -109,7 +109,7 @@ namespace TownOfUs.ManuAPI.Core
             }
         }
 
-        [ManactorRpc(RpcKey)]
+        [ReactorRpc(RpcKey)]
         private static void Receive(byte senderId, string code)
         {
             var client = AmongUsClient.Instance;

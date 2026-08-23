@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using UnityEngine;
 using TownOfUs.ManuAPI.Core;
@@ -183,7 +183,7 @@ namespace TownOfUs.ManuAPI.Roles.Miner
         }
 
         // ── RPCs ─────────────────────────────────────────────────────────────
-        [ManactorRpc(RequestMineRpc)]
+        [ReactorRpc(RequestMineRpc)]
         private static void OnRequestMine(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -200,7 +200,7 @@ namespace TownOfUs.ManuAPI.Roles.Miner
             }
         }
 
-        [ManactorRpc(MineRpc)]
+        [ReactorRpc(MineRpc)]
         private static void OnMine(byte senderId, int ventId, float x, float y)
         {
             var client = AmongUsClient.Instance;

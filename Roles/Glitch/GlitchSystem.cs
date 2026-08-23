@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using ClassicUs.Manactor;
+using ClassicUs.Reactor;
 using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
@@ -306,7 +306,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
         }
 
         // ── RPCs ─────────────────────────────────────────────────────────────
-        [ManactorRpc(RequestMimicRpc)]
+        [ReactorRpc(RequestMimicRpc)]
         private static void OnRequestMimic(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -323,7 +323,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             }
         }
 
-        [ManactorRpc(RequestHackRpc)]
+        [ReactorRpc(RequestHackRpc)]
         private static void OnRequestHack(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -340,7 +340,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             }
         }
 
-        [ManactorRpc(RequestKillRpc)]
+        [ReactorRpc(RequestKillRpc)]
         private static void OnRequestKill(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -357,7 +357,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             }
         }
 
-        [ManactorRpc(MimicRpc)]
+        [ReactorRpc(MimicRpc)]
         private static void OnMimic(byte senderId, byte glitchId, string targetName, int targetColor)
         {
             var client = AmongUsClient.Instance;
@@ -369,7 +369,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             Recolor(glitch, targetColor);
         }
 
-        [ManactorRpc("townofus.GlitchRevert")]
+        [ReactorRpc("townofus.GlitchRevert")]
         private static void OnRevert(byte senderId, byte glitchId, string ownName, int ownColor)
         {
             var client = AmongUsClient.Instance;
@@ -379,7 +379,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             Recolor(glitch, ownColor);
         }
 
-        [ManactorRpc(HackRpc)]
+        [ReactorRpc(HackRpc)]
         private static void OnHack(byte senderId, byte targetId)
         {
             var client = AmongUsClient.Instance;
@@ -391,7 +391,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
                 Local("You have been hacked! You cannot report bodies or do tasks.");
         }
 
-        [ManactorRpc(KillRpc)]
+        [ReactorRpc(KillRpc)]
         private static void OnKill(byte senderId, byte targetId)
         {
             // KillManager.Kill is already networked host-authoritative; the
@@ -399,7 +399,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             // for future hacking/guessing features.
         }
 
-        [ManactorRpc(AssignRpc)]
+        [ReactorRpc(AssignRpc)]
         private static void OnAssignRpc(byte senderId, byte playerId)
         {
             var client = AmongUsClient.Instance;
@@ -414,7 +414,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             _pendingRetries = 0;
         }
 
-        [ManactorRpc(WinRpc)]
+        [ReactorRpc(WinRpc)]
         private static void OnWin(byte senderId)
         {
             var client = AmongUsClient.Instance;

@@ -1,11 +1,11 @@
 # Porting guide: Town-Of-Us (old) → ManuAPI
 
-How each classic Town-Of-Us pattern maps onto the ManuAPI/Manactor model. The Sheriff in
+How each classic Town-Of-Us pattern maps onto the ManuAPI/Reactor model. The Sheriff in
 `Roles/Sheriff/` is the reference implementation of every row below.
 
 ## Pattern mapping
 
-| Old Town-Of-Us (Mono/BepInEx) | ManuAPI / Manactor equivalent |
+| Old Town-Of-Us (Mono/BepInEx) | ManuAPI / Reactor equivalent |
 |---|---|
 | `Role` subclass + 4–6 Harmony patch files per role | One `CustomCrewmateRole` / `CustomImpostorRole` / `CustomRole` descriptor + one `CustomAbility` |
 | Hand-cloned `KillButtonManager` + manual cooldown in `HudManager.Update` | `CustomAbility.Tick(hud)` from a `HudManager.FixedUpdate` patch; `AbilityButton` handles cooldown/visibility |
@@ -13,7 +13,7 @@ How each classic Town-Of-Us pattern maps onto the ManuAPI/Manactor model. The Sh
 | `PlayerControl.ReportClosest` prefix | `GameEvents.BeforeReport += handler` + set `args.Cancelled = true` |
 | `PlayerControl.FixedUpdate` report-button hiding | `GameEvents.BeforeReport` cancellation (skeleton) or a HUD patch (nicety) |
 | `Utils.SetTarget(ref role.ClosestPlayer, KillButton)` | `Core/ClosestPlayerFinder.GetClosestTarget(player, out target)` (shared) |
-| `Utils.RpcMurderPlayer(...)` + `CustomRPC` byte handlers | `KillManager.Kill` + `[ManactorRpc("key")]` handler / `ManactorAPI.SendRpcMethod(key, ...)` |
+| `Utils.RpcMurderPlayer(...)` + `CustomRPC` byte handlers | `KillManager.Kill` + `[ReactorRpc("key")]` handler / `ReactorAPI.SendRpcMethod(key, ...)` |
 | `Murder.KilledPlayers` (static list) | Per-role static tracker synced over the role's own RPC (see `SheriffSystem`) |
 | `CustomGameOptions.*` | `Roles/<Role>/Options.cs` static class; expose through the role's BepInEx section |
 | `RoleEnum.X` / `role.Is(RoleEnum.X)` | `RoleRegistry.IsAssigned(player, "<mod>.<Role>")` |
@@ -65,7 +65,7 @@ Every role gets an on/off toggle in one of the three role sections in
 ## Recommended order (old TOU role list, 20 roles + modifiers + Lovers)
 
 1. ✅ **Sheriff** (done — template role)
-2. **Mayor** — vote-weight; needs `GameEvents.AtMeeting` + a `[ManactorRpc]` to sync the
+2. **Mayor** — vote-weight; needs `GameEvents.AtMeeting` + a `[ReactorRpc]` to sync the
    extra votes (old `MayorMod`). Great second example of state sync.
 3. **Engineer** — vent ability; `CustomAbility` + `GameEvents.PlayerEnteredVent`/`ExitedVent`.
 4. Neutral win-condition roles — **Jester** (ejected win), **Arsonist** (douse → ignite),
@@ -82,7 +82,7 @@ Every role gets an on/off toggle in one of the three role sections in
 ## Version pin & interop drift (Classic Us 8.9 incident)
 
 Targets `ClassicUs.GameLibs 2026.7.11.1` (repacked, real 8.9 interop) + `ManuAPI 1.5.2`
-(a local rebuild of 1.5.1 from source, fixed for 8.9) + `Manactor 1.1.0`. Compatible
+(a local rebuild of 1.5.1 from source, fixed for 8.9) + `Reactor 1.1.0`. Compatible
 with Classic Us **8.9** on Windows and native Linux. The platform packages are kept
 separate under `packages/` and `packages/linux/`; do not mix the generated GameLibs
 or ManuAPI DLLs between OS builds.
