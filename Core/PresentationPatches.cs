@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ClassicUs.ManuAPI;
 using HarmonyLib;
 using UnityEngine;
 using TownOfUs.ManuAPI.Roles.Assassin;
@@ -78,7 +79,7 @@ namespace TownOfUs.ManuAPI.Core
             foreach (var area in states)
             {
                 if (area == null || area.NameText == null) continue;
-                var target = FindPlayer(area.TargetPlayerId);
+                var target = PlayerUtils.FindById(area.TargetPlayerId);
                 if (target == null || target.Data == null) continue;
 
                 if (showRoles && SeerSystem.TryGetReveal(viewer, target, out var revealText, out var revealColor))
@@ -170,7 +171,7 @@ namespace TownOfUs.ManuAPI.Core
             }
         }
 
-        private static PlayerControl FindPlayer(byte id)
+        private static PlayerControl PlayerUtils.FindById(byte id)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == id) return player;

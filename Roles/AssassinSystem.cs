@@ -143,8 +143,8 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
         {
             var client = AmongUsClient.Instance;
             if (client == null || !client.AmHost || senderId != GetClientId(assassinId)) return;
-            var assassin = FindPlayer(assassinId);
-            var target = FindPlayer(targetId);
+            var assassin = PlayerUtils.FindById(assassinId);
+            var target = PlayerUtils.FindById(targetId);
             var canonical = CanonicalizeRole(guess);
             if (assassin != null && target != null && canonical != null)
                 TryGuessTarget(assassin, target, canonical);
@@ -209,13 +209,13 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
         {
             if (args == null || args.Length == 0) return null;
             var query = string.Join(" ", args).Trim();
-            if (byte.TryParse(query, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)) return FindPlayer(id);
+            if (byte.TryParse(query, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)) return PlayerUtils.FindById(id);
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player?.Data != null && string.Equals(player.Data.PlayerName, query, StringComparison.OrdinalIgnoreCase)) return player;
             return null;
         }
 
-        private static PlayerControl FindPlayer(byte id)
+        private static PlayerControl PlayerUtils.FindById(byte id)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == id) return player;
@@ -224,7 +224,7 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
 
         private static byte GetClientId(byte playerId)
         {
-            var player = FindPlayer(playerId);
+            var player = PlayerUtils.FindById(playerId);
             return player == null || player.GetClient() == null ? (byte)255 : (byte)player.GetClient().Id;
         }
 

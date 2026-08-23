@@ -84,7 +84,7 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
                     {
                         if (!Converted.Contains(pair.Key) && IsTargetGone(pair.Value))
                         {
-                            var executioner = FindPlayer(pair.Key);
+                            var executioner = PlayerUtils.FindById(pair.Key);
                             if (executioner != null) ConvertExecutioner(executioner);
                             break;
                         }
@@ -93,13 +93,13 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
             }
 
             if (!_pendingExecutionerId.HasValue) return;
-            var player = FindPlayer(_pendingExecutionerId.Value);
+            var player = PlayerUtils.FindById(_pendingExecutionerId.Value);
             if (player != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(player, ExecutionerRole.Id);
                 if (RoleRegistry.IsAssigned(player, ExecutionerRole.Id))
                 {
-                    var target = FindPlayer(_pendingTargetId ?? 255);
+                    var target = PlayerUtils.FindById(_pendingTargetId ?? 255);
                     if (target != null) TargetOf[player.PlayerId] = target.PlayerId;
                     _pendingExecutionerId = null;
                     _pendingTargetId = null;
@@ -209,7 +209,7 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
             foreach (var pair in TargetOf)
             {
                 if (pair.Value != args.Player.PlayerId) continue;
-                var executioner = FindPlayer(pair.Key);
+                var executioner = PlayerUtils.FindById(pair.Key);
                 if (executioner == null || !IsActiveExecutioner(executioner)) continue;
                 _executionerWon = true;
                 _resultScreenRetries = 0;
@@ -238,14 +238,14 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
                 if (pair.Value == args.Target.PlayerId) { executionerId = pair.Key; break; }
             }
             if (!executionerId.HasValue) return;
-            var executioner = FindPlayer(executionerId.Value);
+            var executioner = PlayerUtils.FindById(executionerId.Value);
             if (executioner == null || !IsActiveExecutioner(executioner)) return;
             ConvertExecutioner(executioner);
         }
 
         private static bool IsTargetGone(byte targetId)
         {
-            var target = FindPlayer(targetId);
+            var target = PlayerUtils.FindById(targetId);
             return target == null || target.Data == null || target.Data.Disconnected;
         }
 
@@ -286,7 +286,7 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
             TargetOf.Remove(executionerId);
             if (string.Equals(mode, "Crewmate", StringComparison.OrdinalIgnoreCase))
             {
-                var player = FindPlayer(executionerId);
+                var player = PlayerUtils.FindById(executionerId);
                 if (player != null && RoleManager.Instance != null) RoleManager.Instance.AssignRole(player, "Crewmate");
                 NotifyConverted(player, mode);
             }
@@ -312,8 +312,8 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var executioner = FindPlayer(executionerId);
-            var target = FindPlayer(targetId);
+            var executioner = PlayerUtils.FindById(executionerId);
+            var target = PlayerUtils.FindById(targetId);
             if (executioner != null && target != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(executioner, ExecutionerRole.Id);
@@ -358,7 +358,7 @@ namespace TownOfUs.ManuAPI.Roles.Executioner
 
         public static void ConsumePendingWin() => _executionerWon = false;
 
-        public static PlayerControl FindPlayer(byte playerId)
+        public static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

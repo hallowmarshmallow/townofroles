@@ -53,7 +53,7 @@ namespace TownOfUs.ManuAPI
     public sealed class TownOfUsPlugin : BasePlugin
     {
         public const string Guid = "townofus.manuapi";
-        public const string Version = "0.7.14";
+        public const string Version = "0.8.0";
 
         private static bool _harmonyHooksInstalled;
         private static bool _eventHooksInstalled;
@@ -1590,6 +1590,9 @@ namespace TownOfUs.ManuAPI
             new Harmony(Guid + ".swapper").UnpatchSelf();
             new Harmony(Guid + ".morphling").UnpatchSelf();
             new Harmony(Guid + ".spy").UnpatchSelf();
+
+            // ReactorNetworking cleanup (lobby mod-compat events).
+            ReactorNetworking.Uninstall();
 
             if (_harmonyHooksInstalled)
             {

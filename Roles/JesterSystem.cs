@@ -46,7 +46,7 @@ namespace TownOfUs.ManuAPI.Roles.Jester
             }
 
             if (!_pendingAssignmentPlayerId.HasValue) return;
-            var player = FindPlayer(_pendingAssignmentPlayerId.Value);
+            var player = PlayerUtils.FindById(_pendingAssignmentPlayerId.Value);
             if (player != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(player, JesterRole.Id);
@@ -140,7 +140,7 @@ namespace TownOfUs.ManuAPI.Roles.Jester
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var target = FindPlayer(playerId);
+            var target = PlayerUtils.FindById(playerId);
             if (target != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(target, JesterRole.Id);
@@ -212,7 +212,7 @@ namespace TownOfUs.ManuAPI.Roles.Jester
 
         public static void ConsumePendingWin() => _jesterWon = false;
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

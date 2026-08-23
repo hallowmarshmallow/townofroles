@@ -75,7 +75,7 @@ namespace TownOfUs.ManuAPI.Roles.Undertaker
             if (Dragged.Count == 0) return;
             foreach (var pair in new Dictionary<byte, byte>(Dragged))
             {
-                var undertaker = FindPlayer(pair.Key);
+                var undertaker = PlayerUtils.FindById(pair.Key);
                 var body = FindBody(pair.Value);
                 if (undertaker == null || undertaker.Data == null || undertaker.Data.IsDead || body == null || body.Reported)
                 {
@@ -145,7 +145,7 @@ namespace TownOfUs.ManuAPI.Roles.Undertaker
             Dragged.Remove(draggerId);
         }
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

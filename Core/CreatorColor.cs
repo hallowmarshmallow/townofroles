@@ -181,7 +181,7 @@ namespace TownOfUs.ManuAPI.Core
                 foreach (var area in states)
                 {
                     if (area == null || area.NameText == null) continue;
-                    var target = FindPlayer(area.TargetPlayerId);
+                    var target = PlayerUtils.FindById(area.TargetPlayerId);
                     if (target == null || target.Data == null) continue;
                     if (!ShouldColor(target.PlayerId, target.Data.PlayerName, localId, secret, legacyName)) continue;
                     SetColor(area.NameText, color);
@@ -219,7 +219,7 @@ namespace TownOfUs.ManuAPI.Core
 
             foreach (var id in new List<byte>(TintedBodies))
             {
-                var player = FindPlayer(id);
+                var player = PlayerUtils.FindById(id);
                 if (player == null || player.Data == null) { TintedBodies.Remove(id); continue; }
                 // A dead player is no longer the visible tinted body (ghost look is
                 // preserved by TintBody's dead check), so restore and converge.
@@ -235,7 +235,7 @@ namespace TownOfUs.ManuAPI.Core
             if (TintedBodies.Count == 0) return;
             foreach (var id in new List<byte>(TintedBodies))
             {
-                var player = FindPlayer(id);
+                var player = PlayerUtils.FindById(id);
                 if (player != null) RestoreBody(player);
             }
             TintedBodies.Clear();
@@ -272,7 +272,7 @@ namespace TownOfUs.ManuAPI.Core
                 && string.Equals(playerName, legacyName, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static PlayerControl FindPlayer(byte id)
+        private static PlayerControl PlayerUtils.FindById(byte id)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == id) return player;

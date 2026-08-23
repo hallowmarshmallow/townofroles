@@ -182,7 +182,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
                 CheckEliminationWin();
                 return;
             }
-            var player = FindPlayer(_pendingPlayerId.Value);
+            var player = PlayerUtils.FindById(_pendingPlayerId.Value);
             if (player != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(player, GlitchRole.Id);
@@ -206,7 +206,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             foreach (var key in new List<byte>(MimicUntil.Keys))
             {
                 if (now < MimicUntil[key]) continue;
-                var glitch = FindPlayer(key);
+                var glitch = PlayerUtils.FindById(key);
                 if (glitch == null || glitch.Data == null) continue;
 
                 MimicUntil.Remove(key);
@@ -362,7 +362,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var glitch = FindPlayer(glitchId);
+            var glitch = PlayerUtils.FindById(glitchId);
             if (glitch == null) return;
             // The name already arrived through the host's RpcSetName broadcast;
             // clients only need to recolor the body.
@@ -374,7 +374,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var glitch = FindPlayer(glitchId);
+            var glitch = PlayerUtils.FindById(glitchId);
             if (glitch == null) return;
             Recolor(glitch, ownColor);
         }
@@ -384,7 +384,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var target = FindPlayer(targetId);
+            var target = PlayerUtils.FindById(targetId);
             if (target == null) return;
             HackUntil[target.PlayerId] = DateTime.UtcNow.AddSeconds(RoleConfig.Seconds(RoleConfig.GlitchHackDuration, 10f));
             if (target.PlayerId == PlayerControl.LocalPlayer?.PlayerId)
@@ -404,7 +404,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var target = FindPlayer(playerId);
+            var target = PlayerUtils.FindById(playerId);
             if (target != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(target, GlitchRole.Id);
@@ -487,7 +487,7 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             }
         }
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

@@ -34,7 +34,7 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
             foreach (var area in states)
             {
                 if (area == null) continue;
-                var target = FindPlayer(area.TargetPlayerId);
+                var target = PlayerUtils.FindById(area.TargetPlayerId);
                 if (!AssassinSystem.IsEligibleTarget(assassin, target)) continue;
                 AddButtons(area, target);
             }
@@ -102,7 +102,7 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
                 return;
             }
 
-            var target = FindPlayer(targetId);
+            var target = PlayerUtils.FindById(targetId);
             if (AssassinSystem.TryGuessTarget(PlayerControl.LocalPlayer, target, Roles[entry.GuessIndex]))
             {
                 if (!AssassinSettingsSync.ActiveMultiKill)
@@ -184,7 +184,7 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
             if (gameObject != null) UnityEngine.Object.Destroy(gameObject);
         }
 
-        private static PlayerControl FindPlayer(byte id)
+        private static PlayerControl PlayerUtils.FindById(byte id)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == id) return player;

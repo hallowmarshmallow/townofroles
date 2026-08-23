@@ -79,7 +79,7 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
             foreach (var key in new List<byte>(MorphUntil.Keys))
             {
                 if (now < MorphUntil[key]) continue;
-                var morphling = FindPlayer(key);
+                var morphling = PlayerUtils.FindById(key);
                 if (morphling == null || morphling.Data == null) continue;
 
                 MorphUntil.Remove(key);
@@ -150,7 +150,7 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var morphling = FindPlayer(morphlingId);
+            var morphling = PlayerUtils.FindById(morphlingId);
             if (morphling == null) return;
             // The name already arrived through the host's RpcSetName broadcast;
             // clients only need to recolor the body.
@@ -162,12 +162,12 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var morphling = FindPlayer(morphlingId);
+            var morphling = PlayerUtils.FindById(morphlingId);
             if (morphling == null) return;
             Recolor(morphling, ownColor);
         }
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

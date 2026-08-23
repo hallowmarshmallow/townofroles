@@ -45,7 +45,7 @@ namespace TownOfUs.ManuAPI.Roles.Altruist
             var body = FindClosestBody(altruist);
             if (body == null) return;
 
-            var revived = FindPlayer(body.ParentId);
+            var revived = PlayerUtils.FindById(body.ParentId);
             if (revived == null || revived.Data == null) return;
 
             var remaining = Math.Max(0, GetUses(altruist.PlayerId) - 1);
@@ -125,7 +125,7 @@ namespace TownOfUs.ManuAPI.Roles.Altruist
             if (client == null || client.AmHost || senderId != client.HostId) return;
             UsesRemaining[altruistId] = Math.Max(0, usesRemaining);
             Cooldowns[altruistId] = DateTime.UtcNow.AddSeconds(RoleConfig.Seconds(RoleConfig.AltruistCooldown));
-            var revived = FindPlayer(revivedId);
+            var revived = PlayerUtils.FindById(revivedId);
             if (revived == null || revived.Data == null) return;
             revived.Revive();
             foreach (var body in UnityEngine.Object.FindObjectsOfType<DeadBody>())
@@ -136,7 +136,7 @@ namespace TownOfUs.ManuAPI.Roles.Altruist
             }
         }
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

@@ -56,7 +56,7 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
 
                 if (_pendingPlayerId.HasValue)
                 {
-                    var pending = FindPlayer(_pendingPlayerId.Value);
+                    var pending = PlayerUtils.FindById(_pendingPlayerId.Value);
                     if (pending != null && RoleManager.Instance != null)
                     {
                         RoleManager.Instance.AssignRole(pending, PhantomRole.Id);
@@ -85,7 +85,7 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
             if (PhantomDead.Count > 0)
             {
                 foreach (var id in new List<byte>(PhantomDead))
-                    Fade(FindPlayer(id));
+                    Fade(PlayerUtils.FindById(id));
             }
         }
 
@@ -213,7 +213,7 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var target = FindPlayer(playerId);
+            var target = PlayerUtils.FindById(playerId);
             if (target != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(target, PhantomRole.Id);
@@ -229,7 +229,7 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
             PhantomDead.Add(phantomId);
-            Fade(FindPlayer(phantomId));
+            Fade(PlayerUtils.FindById(phantomId));
         }
 
         [ReactorRpc(WinRpc)]
@@ -279,7 +279,7 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
         public static void OnGameStarted(GameStartedEventArgs _) => Reset();
         public static void OnGameEnded(GameEndedEventArgs _) { }
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

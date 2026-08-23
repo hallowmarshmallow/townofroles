@@ -152,7 +152,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
             }
 
             if (!_pendingPlayerId.HasValue) return;
-            var player = FindPlayer(_pendingPlayerId.Value);
+            var player = PlayerUtils.FindById(_pendingPlayerId.Value);
             if (player != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(player, ShifterRole.Id);
@@ -255,8 +255,8 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var shifter = FindPlayer(shifterId);
-            var target = FindPlayer(targetId);
+            var shifter = PlayerUtils.FindById(shifterId);
+            var target = PlayerUtils.FindById(targetId);
             if (shifter == null || target == null || RoleManager.Instance == null) return;
 
             SwappedAway.Add(shifterId);
@@ -279,7 +279,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
             if (client == null || client.AmHost || senderId != client.HostId) return;
             // The host's KillManager.Kill already broadcast the networked kill;
             // clients only need the notification.
-            var shifter = FindPlayer(shifterId);
+            var shifter = PlayerUtils.FindById(shifterId);
             if (shifter != null && shifter.PlayerId == PlayerControl.LocalPlayer?.PlayerId)
                 Local("You tried to shift an Impostor and died.");
         }
@@ -289,7 +289,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var target = FindPlayer(playerId);
+            var target = PlayerUtils.FindById(playerId);
             if (target != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(target, ShifterRole.Id);
@@ -349,7 +349,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
             return ids.ToArray();
         }
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

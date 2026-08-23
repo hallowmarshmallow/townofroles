@@ -82,7 +82,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
             var victims = new List<PlayerControl>();
             foreach (var id in Doused)
             {
-                var player = FindPlayer(id);
+                var player = PlayerUtils.FindById(id);
                 if (player != null && player.Data != null && !player.Data.IsDead) victims.Add(player);
             }
             if (victims.Count == 0) return;
@@ -129,7 +129,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
                 CheckEliminationWin();
                 return;
             }
-            var player = FindPlayer(_pendingPlayerId.Value);
+            var player = PlayerUtils.FindById(_pendingPlayerId.Value);
             if (player != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(player, ArsonistRole.Id);
@@ -277,7 +277,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var target = FindPlayer(playerId);
+            var target = PlayerUtils.FindById(playerId);
             if (target != null && RoleManager.Instance != null)
             {
                 RoleManager.Instance.AssignRole(target, ArsonistRole.Id);
@@ -329,7 +329,7 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
 
         public static void ConsumePendingWin() => _arsonistWon = false;
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

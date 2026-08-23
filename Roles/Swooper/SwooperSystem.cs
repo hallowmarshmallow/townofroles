@@ -60,7 +60,7 @@ namespace TownOfUs.ManuAPI.Roles.Swooper
             var now = DateTime.UtcNow;
             foreach (var key in new List<byte>(InvisibleUntil.Keys))
             {
-                var player = FindPlayer(key);
+                var player = PlayerUtils.FindById(key);
                 if (player == null || player.Data == null || player.Data.IsDead)
                 {
                     // Re-enable renderers even on death/despawn so a revived
@@ -117,13 +117,13 @@ namespace TownOfUs.ManuAPI.Roles.Swooper
         {
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
-            var swooper = FindPlayer(swooperId);
+            var swooper = PlayerUtils.FindById(swooperId);
             if (swooper == null) return;
             InvisibleUntil[swooperId] = DateTime.UtcNow.AddSeconds(duration);
             SetHidden(swooper, true);
         }
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;

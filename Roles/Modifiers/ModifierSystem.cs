@@ -284,7 +284,7 @@ namespace TownOfUs.ManuAPI.Roles.Modifiers
             if (DiseasedPenalties.Count == 0) return;
             foreach (var killerId in new List<byte>(DiseasedPenalties.Keys))
             {
-                var killer = FindPlayer(killerId);
+                var killer = PlayerUtils.FindById(killerId);
                 if (killer == null || killer.Data == null || killer.Data.IsDead)
                 {
                     DiseasedPenalties.Remove(killerId);
@@ -302,7 +302,7 @@ namespace TownOfUs.ManuAPI.Roles.Modifiers
             }
         }
 
-        private static PlayerControl FindPlayer(byte playerId)
+        private static PlayerControl PlayerUtils.FindById(byte playerId)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == playerId) return player;
@@ -368,7 +368,7 @@ namespace TownOfUs.ManuAPI.Roles.Modifiers
                     if (area == null || !area.DidVote) continue;
                     if (area.VotedFor == 253 || area.VotedFor == 254) continue;
                     if (area.VotedFor >= __result.Length) continue;
-                    var voter = FindPlayer(area.TargetPlayerId);
+                    var voter = PlayerUtils.FindById(area.TargetPlayerId);
                     if (voter == null || !ModifierSystem.Has(voter.PlayerId, ModifierSystem.Tiebreaker)) continue;
                     __result[area.VotedFor] = (byte)Mathf.Min(255, __result[area.VotedFor] + 1);
                     return;
@@ -380,7 +380,7 @@ namespace TownOfUs.ManuAPI.Roles.Modifiers
             }
         }
 
-        private static PlayerControl FindPlayer(byte id)
+        private static PlayerControl PlayerUtils.FindById(byte id)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == id) return player;

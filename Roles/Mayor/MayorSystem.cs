@@ -58,7 +58,7 @@ namespace TownOfUs.ManuAPI.Roles.Mayor
                     if (area.VotedFor == 253 || area.VotedFor == 254) continue;
                     if (area.VotedFor >= __result.Length) continue;
 
-                    var voter = FindPlayer(area.TargetPlayerId);
+                    var voter = PlayerUtils.FindById(area.TargetPlayerId);
                     if (voter == null || voter.Data == null || !MayorSystem.IsMayor(voter)) continue;
 
                     // Cap so an absurdly high vote bank cannot overflow a byte tally.
@@ -71,7 +71,7 @@ namespace TownOfUs.ManuAPI.Roles.Mayor
             }
         }
 
-        private static PlayerControl FindPlayer(byte id)
+        private static PlayerControl PlayerUtils.FindById(byte id)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
                 if (player != null && player.PlayerId == id) return player;
