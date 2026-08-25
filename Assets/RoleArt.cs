@@ -20,6 +20,7 @@ namespace TownOfUs.ManuAPI.Assets
         private static Sprite _guess;
         private static Sprite _swapperSwitch;
         private static Sprite _morph;
+        private static Sprite _sample;
         private static Sprite _camouflage;
         private static Sprite _swoop;
         private static Sprite _drag;
@@ -66,6 +67,7 @@ namespace TownOfUs.ManuAPI.Assets
             _guess = Load("Guess.png");
             _swapperSwitch = Load("SwapperSwitch.png");
             _morph = Load("Morph.png");
+            _sample = Load("Sample.png");
             _camouflage = Load("Camouflage.png");
             _swoop = Load("Swoop.png");
             _drag = Load("Drag.png");
@@ -89,6 +91,7 @@ namespace TownOfUs.ManuAPI.Assets
         public static Sprite Guess { get { Preload(); return _guess; } }
         public static Sprite SwapperSwitch { get { Preload(); return _swapperSwitch; } }
         public static Sprite Morph { get { Preload(); return _morph; } }
+        public static Sprite Sample { get { Preload(); return _sample; } }
         public static Sprite Camouflage { get { Preload(); return _camouflage; } }
         public static Sprite Swoop { get { Preload(); return _swoop; } }
         public static Sprite Drag { get { Preload(); return _drag; } }

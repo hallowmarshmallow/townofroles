@@ -91,7 +91,6 @@ namespace TownOfUs.ManuAPI.Roles.Assassin
             if (!Entries.TryGetValue(targetId, out var entry)) return;
             entry.GuessIndex = (entry.GuessIndex + 1) % Roles.Length;
             SetGuessText(null, entry, Roles[entry.GuessIndex]);
-            Local("Assassin guess for player " + targetId + ": " + Roles[entry.GuessIndex]);
         }
 
         private static void Guess(byte targetId)

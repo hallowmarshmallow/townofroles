@@ -52,7 +52,6 @@ namespace TownOfUs.ManuAPI.Roles.Miner
 
             CreateVent(id, position, host: true);
             TownOfUsRpcMux.Send(MineRpc, id, position.x, position.y);
-            Local("You placed a mine vent.");
         }
 
         /// <summary>

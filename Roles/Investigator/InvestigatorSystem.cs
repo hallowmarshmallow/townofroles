@@ -59,17 +59,25 @@ namespace TownOfUs.ManuAPI.Roles.Investigator
                 var go = new GameObject("ToU_Footprint_" + player.PlayerId);
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sprite = icon;
-                var colorId = player.Data.ColorId;
-                if (colorId >= 0 && colorId < Palette.PlayerColors.Length)
+                // AnonymousFootprints (original Town-Of-Us default): prints are
+                // grey instead of tinted with the walker's color.
+                if (RoleConfig.FootprintAnonymous?.Value != false)
+                    sr.color = new Color(0.62f, 0.62f, 0.65f, 0.65f);
+                else
                 {
-                    var c = Palette.PlayerColors[colorId];
-                    sr.color = new Color(c.r, c.g, c.b, 0.65f);
+                    var colorId = player.Data.ColorId;
+                    if (colorId >= 0 && colorId < Palette.PlayerColors.Length)
+                    {
+                        var c = Palette.PlayerColors[colorId];
+                        sr.color = new Color(c.r, c.g, c.b, 0.65f);
+                    }
+                    else sr.color = new Color(0.62f, 0.62f, 0.65f, 0.65f);
                 }
                 sr.sortingOrder = -50; // on the ground, under players
                 go.transform.position = player.GetTruePosition();
                 go.transform.localScale = Vector3.one * 0.3f;
                 go.transform.rotation = Quaternion.Euler(0f, 0f, UnityEngine.Random.Range(0f, 360f));
-                Footprints.Add(new Footprint { GameObject = go, Renderer = sr, SpawnedAt = Time.unscaledTime });
+                Footprints.Add(new Footprint { GameObject = go, Renderer = sr, SpawnedAt = Time.unscaledTime, BaseAlpha = sr.color.a });
             }
             catch { }
         }
@@ -89,8 +97,11 @@ namespace TownOfUs.ManuAPI.Roles.Investigator
                 }
                 if (fp.Renderer != null)
                 {
+                    // Keep whichever base alpha the print spawned with (grey
+                    // anonymous prints and colored prints share the fade).
                     var color = fp.Renderer.color;
-                    color.a = 0.65f * (1f - age / duration);
+                    float baseA = fp.BaseAlpha > 0.01f ? fp.BaseAlpha : 0.65f;
+                    color.a = baseA * (1f - age / duration);
                     fp.Renderer.color = color;
                 }
             }
@@ -117,6 +128,7 @@ namespace TownOfUs.ManuAPI.Roles.Investigator
             public GameObject GameObject;
             public SpriteRenderer Renderer;
             public float SpawnedAt;
+            public float BaseAlpha;
         }
     }
 }

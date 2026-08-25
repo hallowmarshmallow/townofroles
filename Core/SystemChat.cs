@@ -96,7 +96,7 @@ namespace TownOfUs.ManuAPI.Core
                 HatBehaviour best = null;
                 for (var i = 0; i < hats.Count; i++)
                 {
-                    var h = hats.get_Item(i);
+                    var h = hats[i];
                     if (h == null) continue;
                     var hay = ((h.StoreName ?? "") + " " + (h.ProductId ?? "")).ToLowerInvariant();
                     if (hay.IndexOf(query, StringComparison.Ordinal) < 0) continue;

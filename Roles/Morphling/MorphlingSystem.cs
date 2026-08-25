@@ -11,31 +11,69 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
     /// <summary>
     /// Morphling gameplay logic (ported from Town-Of-Us' Morphling.cs).
     ///
-    /// Morph copies the nearest player's name (via the game's own RpcSetName,
-    /// which mutates GameData and broadcasts — the host only) and body color
-    /// (via PlayerControl.SetPlayerMaterialColors applied to the player's
-    /// renderers — visual only). The host runs the revert timer from a cached
-    /// copy of the Morphling's original outfit, and tells every client to
-    /// recolor; the original name comes back through the host's RpcSetName.
+    /// Two-step ability, matching upstream:
+    ///   1. SAMPLE — while standing near a player, store their "DNA"
+    ///      (name + color id).
+    ///   2. MORPH — copy the stored DNA: the name changes through the game's
+    ///      own RpcSetName (host-authoritative, broadcast) and the body is
+    ///      recolored visually on every client.
+    ///
+    /// The host validates both steps and runs the revert timer from a cached
+    /// copy of the Morphling's original outfit. The sample persists until the
+    /// Morphling samples someone else (or the round resets), so they can morph
+    /// repeatedly without re-sampling — exactly like old Town-Of-Us.
     /// </summary>
     internal static class MorphlingSystem
     {
         private const string MorphRpc = "townofus.MorphlingMorph";
         private const string RequestMorphRpc = "townofus.MorphlingRequestMorph";
         private const string RevertRpc = "townofus.MorphlingRevert";
+        private const string RequestSampleRpc = "townofus.MorphlingRequestSample";
 
         private static readonly Dictionary<byte, DateTime> MorphUntil = new();
         private static readonly Dictionary<byte, DateTime> Cooldowns = new();
         private static readonly Dictionary<byte, (string Name, int Color)> OriginalOutfit = new();
+        private static readonly Dictionary<byte, (string Name, int Color)> Samples = new();
 
         public static bool IsMorphling(PlayerControl player) =>
             player != null && player.Data != null && RoleRegistry.IsAssigned(player, MorphlingRole.Id);
 
-        internal static bool CanMorphNow(PlayerControl morphling)
+        /// <summary>True once this Morphling has sampled a player's DNA.</summary>
+        public static bool HasSample(PlayerControl morphling) =>
+            morphling != null && Samples.ContainsKey(morphling.PlayerId);
+
+        internal static bool CanSampleNow(PlayerControl morphling)
         {
             if (!IsMorphling(morphling) || morphling.Data == null || morphling.Data.IsDead) return false;
             return DateTime.UtcNow >= GetCooldown(morphling.PlayerId) &&
                    ClosestPlayerFinder.GetClosestTarget(morphling, out _);
+        }
+
+        internal static bool CanMorphNow(PlayerControl morphling)
+        {
+            if (!HasSample(morphling)) return false;
+            return IsMorphling(morphling) && !morphling.Data.IsDead &&
+                   DateTime.UtcNow >= GetCooldown(morphling.PlayerId);
+        }
+
+        public static void TrySample(PlayerControl morphling)
+        {
+            var client = AmongUsClient.Instance;
+            if (client == null || morphling == null || morphling.Data == null) return;
+            if (!client.AmHost)
+            {
+                TownOfUsRpcMux.Send(RequestSampleRpc, morphling.PlayerId);
+                return;
+            }
+            if (!CanSampleNow(morphling)) return;
+            if (!ClosestPlayerFinder.GetClosestTarget(morphling, out var target)) return;
+            if (target.Data == null) return;
+
+            Samples[morphling.PlayerId] = (target.Data.PlayerName, target.Data.ColorId);
+            // Sampling shares the morph cooldown so you cannot sample-and-morph
+            // in the same instant (old TOU behavior).
+            Cooldowns[morphling.PlayerId] =
+                DateTime.UtcNow.AddSeconds(RoleConfig.Seconds(RoleConfig.MorphlingMorphCooldown, 15f));
         }
 
         public static void TryMorph(PlayerControl morphling)
@@ -48,11 +86,8 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
                 return;
             }
             if (!CanMorphNow(morphling)) return;
-            if (!ClosestPlayerFinder.GetClosestTarget(morphling, out var target)) return;
-            if (target.Data == null) return;
+            if (!Samples.TryGetValue(morphling.PlayerId, out var dna)) return;
 
-            var targetName = target.Data.PlayerName;
-            var targetColor = target.Data.ColorId;
             var ownName = morphling.Data.PlayerName;
             var ownColor = morphling.Data.ColorId;
 
@@ -62,10 +97,9 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
             MorphUntil[morphling.PlayerId] = DateTime.UtcNow.AddSeconds(RoleConfig.Seconds(RoleConfig.MorphlingMorphDuration, 10f));
             Cooldowns[morphling.PlayerId] = DateTime.UtcNow.AddSeconds(RoleConfig.Seconds(RoleConfig.MorphlingMorphCooldown, 15f));
 
-            ApplyName(morphling, targetName);
-            Recolor(morphling, targetColor);
-            TownOfUsRpcMux.Send(MorphRpc, morphling.PlayerId, targetName, targetColor);
-            Local("You morphed into " + targetName + ".");
+            ApplyName(morphling, dna.Name);
+            Recolor(morphling, dna.Color);
+            TownOfUsRpcMux.Send(MorphRpc, morphling.PlayerId, dna.Name, dna.Color);
         }
 
         /// <summary>Host tick: revert any morph that has expired (from the cached outfit).</summary>
@@ -128,6 +162,23 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
             }
         }
 
+        [ManactorRpc(RequestSampleRpc)]
+        private static void OnRequestSample(byte senderId, byte playerId)
+        {
+            var client = AmongUsClient.Instance;
+            if (client == null || !client.AmHost) return;
+            foreach (var player in PlayerControl.AllPlayerControls)
+            {
+                if (player == null || player.PlayerId != playerId) continue;
+                var owner = player.GetClient();
+                if (owner != null && owner.Id == senderId)
+                {
+                    TrySample(player);
+                    return;
+                }
+            }
+        }
+
         [ManactorRpc(RequestMorphRpc)]
         private static void OnRequestMorph(byte senderId, byte playerId)
         {
@@ -182,20 +233,12 @@ namespace TownOfUs.ManuAPI.Roles.Morphling
             MorphUntil.Clear();
             Cooldowns.Clear();
             OriginalOutfit.Clear();
+            Samples.Clear();
         }
 
         public static void OnGameStarted(GameStartedEventArgs _) => Reset();
         public static void OnGameEnded(GameEndedEventArgs _) => Reset();
         public static void OnMeetingStarted(MeetingEventArgs _) => Reset();
-
-        private static void Local(string message)
-        {
-            try
-            {
-                SystemChat.Show(message);
-            }
-            catch { }
-        }
     }
 
     [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]

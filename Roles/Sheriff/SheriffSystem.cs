@@ -66,8 +66,13 @@ namespace TownOfUs.ManuAPI.Roles.Sheriff
         private static bool IsKillableNeutral(PlayerControl target)
         {
             if (!Options.KillsNeutrals) return false;
+            // Town-Of-Us' Kill.cs: Jester + Glitch + Arsonist are shootable
+            // (each behind its own upstream option, folded into KillsNeutrals
+            // here). Executioner is this repo's addition — treated like Jester.
             if (RoleRegistry.IsAssigned(target, "townofus.Jester")) return true;
             if (RoleRegistry.IsAssigned(target, "townofus.Executioner")) return true;
+            if (RoleRegistry.IsAssigned(target, "townofus.Glitch")) return true;
+            if (RoleRegistry.IsAssigned(target, "townofus.Arsonist")) return true;
             return false;
         }
 

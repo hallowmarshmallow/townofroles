@@ -122,7 +122,6 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
             }
 
             TownOfUsRpcMux.Send(SwapRpc, shifter.PlayerId, target.PlayerId, targetRoleId ?? string.Empty);
-            Local("You shifted with " + target.Data.PlayerName + ".");
         }
 
         // ── Round lifecycle / pool ───────────────────────────────────────────
@@ -339,7 +338,7 @@ namespace TownOfUs.ManuAPI.Roles.Shifter
             {
                 for (int i = 0; i < player.Data.Tasks.Count; i++)
                 {
-                    var task = player.Data.Tasks.get_Item(i);
+                    var task = player.Data.Tasks[i];
                     if (task == null) continue;
                     // TaskInfo.Id is the task-type index into ShipStatus.TaskTypes
                     // (the interop TaskInfo exposes the native field Id, not TaskType).

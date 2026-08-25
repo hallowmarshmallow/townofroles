@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>ClassicUs.MarshAPI</AssemblyName>
+    <RootNamespace>ClassicUs.ManuAPI</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <NoWarn>CS0626;CS0649;CS8632;CS0108</NoWarn>
+
+    <Version>1.5.1</Version>
+    <PackageId>ClassicUs.MarshAPI</PackageId>
+    <Authors>Manu</Authors>
+    <Description>Modding framework/SDK for Classic Us (Among Us) BepInEx mods. Provides reusable helpers for ability buttons, custom roles and more, built on top of ClassicUs.Manactor.</Description>
+    <PackageTags>among-us classic-us bepinex mod sdk framework</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClassicUs.GameLibs" Version="2026.8.17.1" PrivateAssets="all" />
+    <PackageReference Include="ClassicUs.Manactor" Version="1.1.0" PrivateAssets="all" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <!-- After a successful build, drop the plugin straight into the game's plugin folder
+       when ClassicUsGameDir is set (e.g. an environment variable or -p:ClassicUsGameDir=...). -->
+  <Target Name="CopyToPlugins" AfterTargets="Build" Condition="'$(ClassicUsGameDir)' != ''">
+    <MakeDir Directories="$(ClassicUsGameDir)/BepInEx/plugins" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(ClassicUsGameDir)/BepInEx/plugins" />
+    <Message Importance="high" Text="Copied $(AssemblyName).dll -> $(ClassicUsGameDir)/BepInEx/plugins" />
+  </Target>
+
+</Project>

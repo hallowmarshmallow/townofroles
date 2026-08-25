@@ -19,6 +19,9 @@ namespace TownOfUs.ManuAPI.Roles.Snitch
     internal static class SnitchSystem
     {
         private static readonly Dictionary<byte, ArrowBehaviour> Arrows = new();
+        // Impostors whose overhead name we tinted red (Town-Of-Us
+        // SnitchMod.HighlightImpostors does arrows + red names; restore on clear).
+        private static readonly HashSet<byte> NameHighlighted = new();
 
         public static bool IsSnitch(PlayerControl player) =>
             player != null && player.Data != null && RoleRegistry.IsAssigned(player, SnitchRole.Id);
@@ -31,7 +34,7 @@ namespace TownOfUs.ManuAPI.Roles.Snitch
             var tasks = player.Data.Tasks;
             if (tasks.Count == 0) return false;
             for (int i = 0; i < tasks.Count; i++)
-                if (tasks.get_Item(i) == null || !tasks.get_Item(i).Complete) return false;
+                if (tasks[i] == null || !tasks[i].Complete) return false;
             return true;
         }
 
@@ -72,6 +75,22 @@ namespace TownOfUs.ManuAPI.Roles.Snitch
                     if (!targets.Contains(id)) stale.Add(id);
                 for (int i = 0; i < stale.Count; i++) DestroyArrow(stale[i]);
             }
+
+            // Red nameplates over every living Impostor (local-only visual).
+            // Suppressed while a Camouflager camouflage is live — colored plates
+            // would defeat the whole point of hiding identities.
+            foreach (var player in PlayerControl.AllPlayerControls)
+            {
+                if (player == null || player.Data == null || player.Data.IsDead || player.Data.Disconnected) continue;
+                bool isTarget = !Camouflager.CamouflagerSystem.IsActive && targets.Contains(player.PlayerId);
+                try
+                {
+                    if (player.nameText == null) continue;
+                    player.nameText.color = isTarget ? Palette.ImpostorRed : Color.white;
+                    if (isTarget) NameHighlighted.Add(player.PlayerId);
+                }
+                catch { }
+            }
         }
 
         private static void CreateArrow(PlayerControl player)
@@ -102,8 +121,27 @@ namespace TownOfUs.ManuAPI.Roles.Snitch
 
         private static void ClearAll()
         {
+            if (NameHighlighted.Count > 0)
+            {
+                foreach (var id in new List<byte>(NameHighlighted))
+                {
+                    var player = FindPlayerLocal(id);
+                    if (player != null && player.nameText != null)
+                    {
+                        try { player.nameText.color = Color.white; } catch { }
+                    }
+                }
+                NameHighlighted.Clear();
+            }
             if (Arrows.Count == 0) return;
             foreach (var id in new List<byte>(Arrows.Keys)) DestroyArrow(id);
+        }
+
+        private static PlayerControl FindPlayerLocal(byte playerId)
+        {
+            foreach (var player in PlayerControl.AllPlayerControls)
+                if (player != null && player.PlayerId == playerId) return player;
+            return null;
         }
 
         public static void Reset() => ClearAll();

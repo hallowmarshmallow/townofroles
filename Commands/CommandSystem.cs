@@ -613,7 +613,7 @@ namespace TownOfUs.ManuAPI.Commands
             {
                 for (var i = 0; i < PlayerControl.AllPlayerControls.Count; i++)
                 {
-                    var player = PlayerControl.AllPlayerControls.get_Item(i);
+                    var player = PlayerControl.AllPlayerControls[i];
                     if (player != null && player.PlayerId == id) return player;
                 }
                 return null;
@@ -621,7 +621,7 @@ namespace TownOfUs.ManuAPI.Commands
 
             for (var i = 0; i < PlayerControl.AllPlayerControls.Count; i++)
             {
-                var player = PlayerControl.AllPlayerControls.get_Item(i);
+                var player = PlayerControl.AllPlayerControls[i];
                 if (player != null && player.Data != null &&
                     string.Equals(player.Data.PlayerName, query, StringComparison.OrdinalIgnoreCase))
                     return player;

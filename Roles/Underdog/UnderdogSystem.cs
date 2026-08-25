@@ -24,7 +24,7 @@ namespace TownOfUs.ManuAPI.Roles.Underdog
             var client = AmongUsClient.Instance;
             if (client == null || !client.AmHost) return;
             if (PlayerControl.GameOptions == null) return;
-            if (!RoleConfig.Underdog?.Value == true) return;
+            if (RoleConfig.Underdog?.Value != true) return;
 
             int aliveImpostors = 0;
             int aliveOthers = 0;

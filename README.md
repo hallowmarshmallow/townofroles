@@ -12,15 +12,51 @@ Classic Us (game, DlovanSl)
                   └─ TownOfUs.ManuAPI (this mod)
 ```
 
+## Repository layout (merged monorepo)
+
+Everything needed to build the full mod stack now lives in this single repo —
+no separate Manactor / MarshAPI checkouts required:
+
+```
+TownOfUs.ManuAPI.csproj   plugin project root (Assets/ Commands/ Core/ Roles/
+                          UpdaterPatcher/ are its sources)
+API/                      vendored ClassicUs.MarshAPI source  -> ClassicUs.MarshAPI.dll
+Networking/               vendored ClassicUs.Reactor (Manactor) -> ClassicUs.Manactor.dll
+tools/                    packaging / update-server helpers
+packages/                 local NuGet feed (GameLibs + Manactor reference packages)
+nuget.config              feed wiring for everything above
+build.sh                  one-command build of all three assemblies
+```
+
+The plugin references `API/ManuAPI.csproj` directly, so building the plugin
+builds MarshAPI from source; `build.sh` additionally builds Manactor first and
+stages all three DLLs into `dist/plugins/`.
+
 ## Build
 
-Requires the .NET SDK (the project targets `net6.0`):
+### One-command build (all three DLLs)
+
+```bash
+sh build.sh            # Release; or: sh build.sh Debug
+```
+
+Stages into `dist/plugins/`:
+- `ClassicUs.Manactor.dll` — networking framework (install first)
+- `ClassicUs.MarshAPI.dll` — modding SDK (same BepInEx GUID as the old
+  `ClassicUs.ManuAPI.dll`; **remove that old file** before installing, never
+  keep both)
+- `TownOfUs.ManuAPI.dll` — the role mod
+
+Drop the folder contents into `<game>/BepInEx/plugins/`.
+
+### Plugin only
 
 ```bash
 dotnet build -c Release
 ```
 
-Output: `bin/Release/TownOfUs.ManuAPI.dll`.
+Output: `bin/Release/TownOfUs.ManuAPI.dll` (MarshAPI is built automatically via
+the project reference).
 
 > **Important:** the `ClassicUs.GameLibs` package on nuget.org is malformed (backslash
 > paths inside the archive), so NuGet finds no assets in it and the build would fail with
@@ -73,12 +109,15 @@ DLLs rebuilt against the Windows 8.9 `GameAssembly.dll`. ManuAPI 1.5.2 is the
 `BepInEx/config/TownOfUs.ManuAPI.cfg` is created on first launch. Each role has an
 on/off toggle — a disabled role is never registered, so it cannot be assigned.
 Role toggles and command availability require a restart after changing them.
-The role settings are stored in three BepInEx configuration sections that act as
-stable role tabs without modifying Classic Us' native Game Options screen:
+The role settings are stored in four BepInEx configuration sections that act as
+stable tabs without modifying Classic Us' native Game Options screen:
 
-- `[Crewmate Roles]` — Sheriff, Engineer, Medic, Seer, and Vigilante
-- `[Impostor Roles]` — Assassin
-- `[Neutral Roles]` — Jester
+- `[Crewmate Roles]` — Sheriff, Engineer, Medic, Seer, Vigilante, Altruist, Mayor,
+  Swapper, Spy, Investigator, TimeLord, Snitch
+- `[Impostor Roles]` — Assassin, Janitor, Morphling, Camouflager, Swooper, Underdog,
+  Undertaker, Miner
+- `[Neutral Roles]` — Jester, Executioner, Arsonist, Phantom, Shifter, Glitch
+- `[Modifiers]` — Torch, Diseased, Flash, Tiebreaker
 
 The native Game Options screen is intentionally never patched. ManuAPI's public
 settings builder only appends rows to the native scroller; on Classic Us 8.9 that
@@ -86,6 +125,7 @@ path can freeze when the menu opens. Role toggles, gameplay config, commands, an
 Freeplay role selection are available through the config file and commands instead:
 
 - role count and spawn chance for Sheriff, Engineer, Jester, Medic, Seer, and Vigilante
+- Investigator footprint interval/duration and the `FootprintAnonymous` grey-print mode (original Town-Of-Us default)
 - Sheriff and Engineer cooldowns
 - Medic shield uses, cooldown, and whether a blocked kill consumes the shield
 - Seer investigation uses, cooldown, and Faction versus exact Role reveal
@@ -129,15 +169,30 @@ VigilanteCooldown = 0
 
 [Impostor Roles]
 Assassin = true
-AssassinCount = 1
-AssassinChance = 100
-AssassinMultiKill = false
-AssassinMeetingButtons = true
+Janitor = true
+Morphling = true
+Camouflager = true
+Swooper = true
+Underdog = true
+Undertaker = true
+Miner = true
+# every role also has <Role>Count / <Role>Chance plus role-specific tuning,
+# e.g. JanitorCleanCooldown, MorphlingMorphCooldown/Duration, UnderdogCooldownMultiplier
 
 [Neutral Roles]
 Jester = true
-JesterCount = 1
-JesterChance = 100
+Executioner = true
+Arsonist = true
+Phantom = true
+Shifter = true
+Glitch = true
+
+[Modifiers]
+Torch = true
+Diseased = true
+Flash = true
+Tiebreaker = true
+# modifiers use <Modifier>Probability (0-100) instead of Count/Chance
 
 [Presentation]
 Enabled = true
@@ -201,21 +256,22 @@ The command layer is disabled with:
 Enabled = false
 ```
 
-## Current status — skeleton
+## Current status
 
-| Area | Status |
+All 20 classic Town-Of-Us roles plus 4 modifiers are implemented and registered
+(26 role descriptors + the modifier system). Every role is behind its own config
+toggle with per-role `Count`/`Chance` and role-specific tuning keys in `Core/RoleConfig.cs`:
+
+| Team | Roles |
 |---|---|
-| Project scaffolding (builds against real 8.9 interop + ManuAPI 1.5.2 rebuilt for 8.9) | ✅ |
-| **Sheriff** (Crewmate) — worked example | ✅ native Kill button, correct/wrong-target kill logic, suicide on miss, self-report suppression, cross-client kill tracking via `[ManactorRpc]`, config toggle |
-| **Engineer** (Crewmate) — native vent + Fix Sab slice | ✅ virtual role, Freeplay computer selection, native vent permission/networking, native Fix Sab button, config toggle; ⏳ classic vent cooldown/limited-time/repair extras |
-| **Medic** (Crewmate) — one-use shield | ✅ host-authoritative shield RPC, murder cancellation, toggle, original Town Of Us Medic art embedded |
-| **Seer** (Crewmate) — one-use faction investigation | ✅ host-authoritative investigation RPC, result delivery, toggle, original Town Of Us Seer art embedded |
-| **Vigilante** (Crewmate) — one-shot impostor kill / self-kill on mistake | ✅ host-authoritative shot RPC and toggle; no standalone Vigilante icon exists in the cloned source |
-| **Jester** (Neutral win condition) — voted-out win, explicit Jester Wins result | ✅ toggleable virtual role, Freeplay selector, host-authoritative exile win |
-| Janitor, Mayor, Swapper, other neutral roles, modifiers, Lovers | ⏳ next port batches; original Janitor and Swapper art is already bundled for their implementations |
+| Crewmate | Sheriff, Engineer, Medic, Seer, Vigilante, Altruist, Mayor, Swapper, Spy, Investigator, Time Lord, Snitch |
+| Impostor | Assassin, Janitor, Morphling, Camouflager, Swooper, Underdog, Undertaker, Miner |
+| Neutral | Jester, Executioner, Arsonist, Phantom, Shifter, The Glitch |
+| Modifiers | Torch, Diseased, Flash, Tiebreaker |
 
-The **Sheriff** is the template role: copy `Roles/Sheriff/` and rename to add the next
-role. `PORTING.md` has the old-TOU → ManuAPI mapping table and a recommended order.
+The **Sheriff** remains the reference/template implementation: copy `Roles/Sheriff/`
+and rename to add new roles. `PORTING.md` has the old-TOU → ManuAPI mapping table
+and the interop-regeneration pipeline.
 
 > The three role sections are BepInEx configuration sections, not actual tabs inside
 > the game's Game Options screen. Classic Us 8.9's native settings list is left

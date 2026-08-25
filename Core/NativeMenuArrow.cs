@@ -264,7 +264,7 @@ namespace TownOfUs.ManuAPI.Core
                 bool seeded = false;
                 for (int i = 0; i < menu.AllItems.Count; i++)
                 {
-                    var tr = menu.AllItems.get_Item(i);
+                    var tr = menu.AllItems[i];
                     if (tr == null) continue;
                     var p = tr.position;
                     if (!seeded) { min = max = p; seeded = true; continue; }

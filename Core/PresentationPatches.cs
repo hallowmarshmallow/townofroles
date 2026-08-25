@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 using TownOfUs.ManuAPI.Roles.Assassin;
+using TownOfUs.ManuAPI.Roles.Camouflager;
 using TownOfUs.ManuAPI.Roles.Modifiers;
 using TownOfUs.ManuAPI.Roles.Seer;
 
@@ -19,6 +20,20 @@ namespace TownOfUs.ManuAPI.Core
             if (RoleConfig.PresentationEnabled?.Value != true) return;
             var viewer = PlayerControl.LocalPlayer;
             if (viewer == null || viewer.Data == null) return;
+
+            // While the Camouflager's round-wide camouflage is live, every
+            // overhead name must stay blank. The role-line branches below run at
+            // 10 Hz and would otherwise re-write "Name\n<Role" right on top of
+            // CamouflagerSystem.ApplyCamo's blanks.
+            if (CamouflagerSystem.IsActive)
+            {
+                foreach (var player in PlayerControl.AllPlayerControls)
+                {
+                    if (player == null || player.nameText == null) continue;
+                    SetText(player.nameText, string.Empty);
+                }
+                return;
+            }
 
             foreach (var player in PlayerControl.AllPlayerControls)
             {

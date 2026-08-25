@@ -101,6 +101,8 @@ namespace TownOfUs.ManuAPI.Core
         public static ConfigEntry<int> MedicUses { get; private set; }
         public static ConfigEntry<float> MedicCooldown { get; private set; }
         public static ConfigEntry<bool> MedicShieldBreaksOnKill { get; private set; }
+        public static ConfigEntry<int> MedicReportNameDuration { get; private set; }
+        public static ConfigEntry<int> MedicReportColorDuration { get; private set; }
         public static ConfigEntry<int> SeerUses { get; private set; }
         public static ConfigEntry<float> SeerCooldown { get; private set; }
         public static ConfigEntry<string> SeerRevealMode { get; private set; }
@@ -126,8 +128,10 @@ namespace TownOfUs.ManuAPI.Core
         public static ConfigEntry<float> UndertakerDragCooldown { get; private set; }
         public static ConfigEntry<float> FootprintInterval { get; private set; }
         public static ConfigEntry<float> FootprintDuration { get; private set; }
+        public static ConfigEntry<bool> FootprintAnonymous { get; private set; }
         public static ConfigEntry<float> RewindCooldown { get; private set; }
         public static ConfigEntry<float> RewindSeconds { get; private set; }
+        public static ConfigEntry<bool> RewindRevive { get; private set; }
         public static ConfigEntry<float> ShiftCooldown { get; private set; }
         public static ConfigEntry<float> GlitchMimicCooldown { get; private set; }
         public static ConfigEntry<float> GlitchMimicDuration { get; private set; }
@@ -257,6 +261,8 @@ namespace TownOfUs.ManuAPI.Core
             MedicUses = BindCount(config, "Crewmate Roles", "MedicUses", 1, "Number of shields the Medic can place per game.");
             MedicCooldown = BindSeconds(config, "Crewmate Roles", "MedicCooldown", 0f, "Seconds between Medic shields; zero allows immediate next use.");
             MedicShieldBreaksOnKill = config.Bind("Crewmate Roles", "MedicShieldBreaksOnKill", true, "Consume the shield when it blocks a murder.");
+            MedicReportNameDuration = config.Bind("Crewmate Roles", "MedicReportNameDuration", 15, "Body Report: seconds after a kill within which the Medic learns the killer's name.");
+            MedicReportColorDuration = config.Bind("Crewmate Roles", "MedicReportColorDuration", 40, "Body Report: seconds after a kill within which the Medic learns the killer's color shade.");
             SeerUses = BindCount(config, "Crewmate Roles", "SeerUses", 1, "Number of investigations the Seer can perform per game.");
             SeerCooldown = BindSeconds(config, "Crewmate Roles", "SeerCooldown", 0f, "Seconds between Seer investigations; zero allows immediate next use.");
             SeerRevealMode = config.Bind("Crewmate Roles", "SeerRevealMode", "Faction", "Faction or Role. Faction is safer for virtual custom roles.");
@@ -282,8 +288,10 @@ namespace TownOfUs.ManuAPI.Core
             UndertakerDragCooldown = BindSeconds(config, "Impostor Roles", "UndertakerDragCooldown", 10f, "Seconds between Undertaker drags.");
             FootprintInterval = BindSeconds(config, "Crewmate Roles", "FootprintInterval", 3f, "Seconds between Investigator footprint drops.");
             FootprintDuration = BindSeconds(config, "Crewmate Roles", "FootprintDuration", 10f, "How long Investigator footprints stay visible.");
+            FootprintAnonymous = config.Bind("Crewmate Roles", "FootprintAnonymous", true, "Investigator footprints are grey instead of player-colored (original Town-Of-Us AnonymousFootprints default).");
             RewindCooldown = BindSeconds(config, "Crewmate Roles", "RewindCooldown", 30f, "Seconds between Time Lord rewinds.");
             RewindSeconds = BindSeconds(config, "Crewmate Roles", "RewindSeconds", 5f, "How far back a Time Lord rewind goes.");
+            RewindRevive = config.Bind("Crewmate Roles", "RewindRevive", true, "Players killed inside the rewind window are revived by the rewind (Town-Of-Us behavior).");
             ShiftCooldown = BindSeconds(config, "Neutral Roles", "ShiftCooldown", 30f, "Seconds between Shifter shifts.");
             GlitchMimicCooldown = BindSeconds(config, "Neutral Roles", "GlitchMimicCooldown", 30f, "Seconds between Glitch mimics.");
             GlitchMimicDuration = BindSeconds(config, "Neutral Roles", "GlitchMimicDuration", 10f, "How long a Glitch mimic lasts.");

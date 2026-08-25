@@ -963,8 +963,13 @@ namespace TownOfUs.ManuAPI
             if (RoleConfig.Medic.Value)
             {
                 GameEvents.BeforeMurder += MedicSystem.OnBeforeMurder;
+                GameEvents.AfterReport += MedicSystem.OnAfterReport;
                 GameEvents.GameStarted += MedicSystem.OnGameStarted;
                 GameEvents.GameEnded += MedicSystem.OnGameEnded;
+                // Body Report needs cross-client kill records.
+                GameEvents.AfterMurder += Core.KillLog.OnAfterMurder;
+                GameEvents.GameStarted += Core.KillLog.OnGameStarted;
+                GameEvents.GameEnded += Core.KillLog.OnGameEnded;
                 _medicEventHooksInstalled = true;
             }
             if (RoleConfig.Seer.Value)
@@ -1406,8 +1411,12 @@ namespace TownOfUs.ManuAPI
                 if (_medicEventHooksInstalled)
                 {
                     GameEvents.BeforeMurder -= MedicSystem.OnBeforeMurder;
+                    GameEvents.AfterReport -= MedicSystem.OnAfterReport;
                     GameEvents.GameStarted -= MedicSystem.OnGameStarted;
                     GameEvents.GameEnded -= MedicSystem.OnGameEnded;
+                    GameEvents.AfterMurder -= Core.KillLog.OnAfterMurder;
+                    GameEvents.GameStarted -= Core.KillLog.OnGameStarted;
+                    GameEvents.GameEnded -= Core.KillLog.OnGameEnded;
                     _medicEventHooksInstalled = false;
                 }
                 if (_seerEventHooksInstalled)
@@ -1551,6 +1560,9 @@ namespace TownOfUs.ManuAPI
             GameEvents.GameEnded -= ModifierSystem.OnGameEnded;
             GameEvents.BeforeMurder -= ModifierSystem.OnBeforeMurder;
             GameEvents.GameEnded -= CreatorColor.OnGameEnded;
+            GameEvents.GameStarted -= CreatorColor.OnGameStarted;
+            GameEvents.GameStarted -= LobbyCode.OnGameStarted;
+            GameEvents.PlayerJoined -= LobbyCode.OnPlayerJoined;
             ModifierSystem.Reset();
             new Harmony(Guid + ".modifiers").UnpatchSelf();
             new Harmony(Guid + ".batch3").UnpatchSelf();

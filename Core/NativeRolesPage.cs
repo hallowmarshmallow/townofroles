@@ -167,7 +167,7 @@ namespace TownOfUs.ManuAPI.Core
             {
                 for (int i = 0; i < menu.AllItems.Count; i++)
                 {
-                    var t = menu.AllItems.get_Item(i);
+                    var t = menu.AllItems[i];
                     if (t != null && t.gameObject != null && t.gameObject.activeSelf) t.gameObject.SetActive(false);
                 }
             }
@@ -285,7 +285,7 @@ namespace TownOfUs.ManuAPI.Core
                 {
                     for (int i = 0; i < _menu.AllItems.Count; i++)
                     {
-                        var t = _menu.AllItems.get_Item(i);
+                        var t = _menu.AllItems[i];
                         if (t != null && t.gameObject != null && !t.gameObject.activeSelf) t.gameObject.SetActive(true);
                     }
                 }
@@ -579,7 +579,7 @@ namespace TownOfUs.ManuAPI.Core
             {
                 for (int i = 0; i < menu.AllItems.Count; i++)
                 {
-                    var item = menu.AllItems.get_Item(i);
+                    var item = menu.AllItems[i];
                     if (item != null) return item.localPosition.y;
                 }
             }
@@ -591,7 +591,7 @@ namespace TownOfUs.ManuAPI.Core
             if (menu.AllItems == null) return null;
             for (int i = 0; i < menu.AllItems.Count; i++)
             {
-                var item = menu.AllItems.get_Item(i);
+                var item = menu.AllItems[i];
                 if (item == null) continue;
                 var number = item.GetComponentInChildren<NumberOption>(true);
                 if (number != null) return number;

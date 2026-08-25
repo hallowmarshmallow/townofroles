@@ -90,7 +90,6 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
             Doused.Clear();
             foreach (var victim in victims) KillManager.Kill(arsonist, victim);
             TownOfUsRpcMux.Send(IgniteRpc);
-            Local("The Arsonist ignited their doused targets!");
         }
 
         // ── Round lifecycle / pool ───────────────────────────────────────────
@@ -293,7 +292,6 @@ namespace TownOfUs.ManuAPI.Roles.Arsonist
             var client = AmongUsClient.Instance;
             if (client == null || client.AmHost || senderId != client.HostId) return;
             Doused.Clear();
-            Local("The Arsonist ignited their doused targets!");
         }
 
         [ManactorRpc(WinRpc)]

@@ -104,6 +104,17 @@ def main():
 
     shutil.copy(dll, os.path.join(STAGE, args.dll_name))
 
+    # The merged repo builds the full dependency chain too; stage those DLLs so a
+    # single release carries everything BepInEx/plugins/ needs.
+    for extra in (
+        os.path.join(ROOT, "Networking", "bin", "Release", "ClassicUs.Manactor.dll"),
+        os.path.join(ROOT, "API", "bin", "Release", "ClassicUs.MarshAPI.dll"),
+    ):
+        if os.path.isfile(extra):
+            shutil.copy(extra, STAGE)
+        else:
+            print(f"NOTE: {extra} missing — run 'sh build.sh' first if the release should include it.")
+
     print("=" * 70)
     if args.download_url:
         print("Local test host stage complete. Point the mod's [Updates] config here:")

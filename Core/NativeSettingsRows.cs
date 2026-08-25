@@ -175,7 +175,7 @@ namespace TownOfUs.ManuAPI.Core
             {
                 for (int i = menu.AllItems.Count - 1; i >= 0; i--)
                 {
-                    var item = menu.AllItems.get_Item(i);
+                    var item = menu.AllItems[i];
                     if (item != null && item.gameObject != null && item.gameObject.activeSelf)
                         return item.localPosition.y;
                 }
@@ -188,7 +188,7 @@ namespace TownOfUs.ManuAPI.Core
             if (menu.AllItems == null) return null;
             for (int i = 0; i < menu.AllItems.Count; i++)
             {
-                var item = menu.AllItems.get_Item(i);
+                var item = menu.AllItems[i];
                 if (item == null) continue;
                 var number = item.GetComponentInChildren<NumberOption>(true);
                 if (number != null) return number;

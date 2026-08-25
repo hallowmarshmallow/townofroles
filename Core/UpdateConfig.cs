@@ -22,7 +22,7 @@ namespace TownOfUs.ManuAPI.Core
 
             ManifestUrl = config.Bind(
                 "Updates", "ManifestUrl",
-                "https://github.com/OWNER/REPO/releases/latest/download/latest.json",
+                "https://github.com/hallowmarshmallow/townofroles/releases/latest/download/latest.json",
                 "URL of the latest.json update manifest. With GitHub Releases, use the stable 'releases/latest/download/latest.json' URL so it always points at the newest release.");
 
             AllowDownload = config.Bind(

@@ -50,7 +50,6 @@ namespace TownOfUs.ManuAPI.Roles.Swooper
             InvisibleUntil[swooper.PlayerId] = DateTime.UtcNow.AddSeconds(duration);
             TownOfUsRpcMux.Send(StartRpc, swooper.PlayerId, duration);
             SetHidden(swooper, true);
-            Local("You swooped into the shadows.");
         }
 
         /// <summary>Runs every frame on every client: hide active swoopers, restore on expiry.</summary>

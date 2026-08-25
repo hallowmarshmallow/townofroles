@@ -83,7 +83,6 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             ApplyName(glitch, targetName);
             Recolor(glitch, targetColor);
             TownOfUsRpcMux.Send(MimicRpc, glitch.PlayerId, targetName, targetColor);
-            Local("You mimicked " + targetName + ".");
         }
 
         // ── Hack ─────────────────────────────────────────────────────────────
@@ -110,7 +109,6 @@ namespace TownOfUs.ManuAPI.Roles.Glitch
             HackUntil[target.PlayerId] = DateTime.UtcNow.AddSeconds(RoleConfig.Seconds(RoleConfig.GlitchHackDuration, 10f));
             HackCooldowns[glitch.PlayerId] = DateTime.UtcNow.AddSeconds(RoleConfig.Seconds(RoleConfig.GlitchHackCooldown, 30f));
             TownOfUsRpcMux.Send(HackRpc, target.PlayerId);
-            Local("You hacked " + target.Data.PlayerName + ".");
         }
 
         // ── Kill ─────────────────────────────────────────────────────────────

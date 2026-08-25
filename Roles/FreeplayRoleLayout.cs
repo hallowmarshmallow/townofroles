@@ -23,7 +23,7 @@ namespace TownOfUs.ManuAPI.Roles
             var roleButtons = new List<Transform>();
             for (int i = 0; i < game.ActiveItems.Count; i++)
             {
-                var item = game.ActiveItems.get_Item(i);
+                var item = game.ActiveItems[i];
                 if (item == null) continue;
                 var button = item.GetComponent<TaskAddButton>();
                 if (button != null && button.IsRole) roleButtons.Add(item);

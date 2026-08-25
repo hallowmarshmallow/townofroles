@@ -157,7 +157,7 @@ namespace TownOfUs.ManuAPI.Roles.Phantom
                 if (player.Data.Tasks == null || player.Data.Tasks.Count == 0) continue;
                 var allDone = true;
                 for (int i = 0; i < player.Data.Tasks.Count; i++)
-                    if (player.Data.Tasks.get_Item(i) == null || !player.Data.Tasks.get_Item(i).Complete) { allDone = false; break; }
+                    if (player.Data.Tasks[i] == null || !player.Data.Tasks[i].Complete) { allDone = false; break; }
                 if (!allDone) continue;
 
                 _phantomWon = true;

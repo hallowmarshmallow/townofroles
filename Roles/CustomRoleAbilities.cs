@@ -48,6 +48,7 @@ namespace TownOfUs.ManuAPI.Roles
         private static readonly JanitorButton Janitor = new();
         private static readonly AltruistButton Altruist = new();
         private static readonly ArsonistButton Arsonist = new();
+        private static readonly MorphlingSampleButton MorphlingSample = new();
         private static readonly MorphlingButton Morphling = new();
         private static readonly CamouflagerButton Camouflager = new();
         private static readonly SwooperButton Swooper = new();
@@ -59,17 +60,22 @@ namespace TownOfUs.ManuAPI.Roles
         private static readonly GlitchKillButton GlitchKill = new();
         private static readonly MinerButton Miner = new();
 
-        private static readonly RoleAbilityButton[] All = { Engineer, Medic, Seer, Sheriff, Vigilante, Janitor, Altruist, Arsonist, Morphling, Camouflager, Swooper, Undertaker, TimeLord, Shifter, GlitchMimic, GlitchHack, GlitchKill, Miner };
+        private static readonly RoleAbilityButton[] All = { Engineer, Medic, Seer, Sheriff, Vigilante, Janitor, Altruist, Arsonist, MorphlingSample, Morphling, Camouflager, Swooper, Undertaker, TimeLord, Shifter, GlitchMimic, GlitchHack, GlitchKill, Miner };
 
         internal static void Tick(HudManager hud)
         {
             if (hud == null || hud.KillButton == null) return;
 
             var local = PlayerControl.LocalPlayer;
-            // Only create/refresh buttons while actually playing as an alive role.
-            // Outside a live round (lobby, Freeplay computer, meeting transitions)
-            // the HUD button template is not in a safe state to clone every frame.
-            if (local == null || local.Data == null || local.Data.IsDead) return;
+            // Buttons are created and ticked only in a playable round state.
+            // Everything else (lobby, menu, meetings, being dead) hides them;
+            // they come straight back the moment the state turns playable again
+            // (e.g. an Altruist revive brings a ghost's buttons back).
+            if (!IsPlayableState(local))
+            {
+                HideAll();
+                return;
+            }
 
             Engineer.Tick(hud);
             Medic.Tick(hud);
@@ -79,6 +85,7 @@ namespace TownOfUs.ManuAPI.Roles
             Janitor.Tick(hud);
             Altruist.Tick(hud);
             Arsonist.Tick(hud);
+            MorphlingSample.Tick(hud);
             Morphling.Tick(hud);
             Camouflager.Tick(hud);
             Swooper.Tick(hud);
@@ -89,6 +96,26 @@ namespace TownOfUs.ManuAPI.Roles
             GlitchHack.Tick(hud);
             GlitchKill.Tick(hud);
             Miner.Tick(hud);
+        }
+
+        /// <summary>True exactly when custom ability buttons may be visible.</summary>
+        private static bool IsPlayableState(PlayerControl local)
+        {
+            if (local == null || local.Data == null || local.Data.IsDead) return false;
+            var client = AmongUsClient.Instance;
+            if (client == null || client.GameState != InnerNetClient.GameStates.Started) return false;
+            if (MeetingHud.Instance != null || ExileController.Instance != null) return false;
+            return true;
+        }
+
+        /// <summary>Hides every button without destroying it (ghost / lobby / meeting).</summary>
+        internal static void HideAll()
+        {
+            foreach (var ability in All)
+            {
+                try { ability.Hide(); }
+                catch { }
+            }
         }
 
         internal static void ResetAll()
@@ -240,15 +267,34 @@ namespace TownOfUs.ManuAPI.Roles
             protected override void OnActivate() => ArsonistSystem.TryDouse(PlayerControl.LocalPlayer);
         }
 
-        private sealed class MorphlingButton : RoleAbilityButton
+        private sealed class MorphlingSampleButton : RoleAbilityButton
         {
-            protected override string Name => "Morph";
-            protected override Sprite CreateIcon(Sprite original) => RoleArt.Morph ?? original;
+            protected override string Name => "Sample";
+            protected override Sprite CreateIcon(Sprite original) => RoleArt.Sample ?? original;
             protected override bool IsVisible()
             {
                 var local = PlayerControl.LocalPlayer;
                 return local != null && local.Data != null && RoleConfig.Morphling?.Value == true &&
                        MorphlingSystem.IsMorphling(local) && !local.Data.IsDead;
+            }
+            protected override bool CanActivate() => MorphlingSystem.CanSampleNow(PlayerControl.LocalPlayer);
+            protected override void OnActivate() => MorphlingSystem.TrySample(PlayerControl.LocalPlayer);
+        }
+
+        private sealed class MorphlingButton : RoleAbilityButton
+        {
+            protected override string Name => "Morph";
+            // Second button of the pair: stacked on top of the Sample button.
+            protected override int SlotIndex => 1;
+            protected override Sprite CreateIcon(Sprite original) => RoleArt.Morph ?? original;
+            protected override bool IsVisible()
+            {
+                var local = PlayerControl.LocalPlayer;
+                // Hidden until DNA has been sampled — no point showing a morph
+                // button that can never activate.
+                return local != null && local.Data != null && RoleConfig.Morphling?.Value == true &&
+                       MorphlingSystem.IsMorphling(local) && !local.Data.IsDead &&
+                       MorphlingSystem.HasSample(local);
             }
             protected override bool CanActivate() => MorphlingSystem.CanMorphNow(PlayerControl.LocalPlayer);
             protected override void OnActivate() => MorphlingSystem.TryMorph(PlayerControl.LocalPlayer);
@@ -344,7 +390,8 @@ namespace TownOfUs.ManuAPI.Roles
         private sealed class GlitchHackButton : RoleAbilityButton
         {
             protected override string Name => "Hack";
-            protected override Vector3 SlotOffset => new(0f, 0.9f, 0f);
+            // Stacked on top of the Mimic button.
+            protected override int SlotIndex => 1;
             protected override Sprite CreateIcon(Sprite original) => original;
             protected override bool IsVisible()
             {
@@ -359,7 +406,8 @@ namespace TownOfUs.ManuAPI.Roles
         private sealed class GlitchKillButton : RoleAbilityButton
         {
             protected override string Name => "Kill";
-            protected override Vector3 SlotOffset => new(0f, 1.8f, 0f);
+            // Third button: further left, separated from the Mimic/Hack column.
+            protected override int SlotIndex => 2;
             protected override Sprite CreateIcon(Sprite original) => original;
             protected override bool IsVisible()
             {
@@ -407,14 +455,29 @@ namespace TownOfUs.ManuAPI.Roles
 
         protected abstract string Name { get; }
         protected virtual float Cooldown => 0f;
-        // Vertical offset (world units) from the prefab's own ability-button slot,
-        // so multi-button roles stack up into distinct slots instead of overlapping.
-        // Zero keeps a single-ability button exactly on the game's native slot.
-        protected virtual Vector3 SlotOffset => Vector3.zero;
+        /// <summary>
+        /// Slot order for a role's buttons, mirroring the vanilla HUD reading
+        /// order: 0 is the native ability slot next to Use (left of Use), 1
+        /// stacks directly on top of slot 0, 2+ spawn further left with one
+        /// button of separation each.
+        /// </summary>
+        protected virtual int SlotIndex => 0;
         protected abstract Sprite CreateIcon(Sprite original);
         protected abstract bool IsVisible();
         protected virtual bool CanActivate() => true;
         protected abstract void OnActivate();
+
+        // AspectPosition DistanceFromEdge is measured inward from the anchored
+        // edges of the BottomRight HUD container: +x moves left, +y moves up.
+        private static Vector3 SlotOffsetForIndex(int index)
+        {
+            switch (index)
+            {
+                case 0: return Vector3.zero;
+                case 1: return new Vector3(0f, 1f, 0f);                     // on top of slot 0
+                default: return new Vector3(1.25f * (index - 1), 0f, 0f);   // left, separated
+            }
+        }
 
         internal void Tick(HudManager hud)
         {
@@ -441,7 +504,16 @@ namespace TownOfUs.ManuAPI.Roles
                 _renderer.color = ready ? Color.white : new Color(0.45f, 0.45f, 0.45f, 0.55f);
             if (_cooldownText != null)
                 _cooldownText.text = _cooldownRemaining > 0f ? Mathf.Ceil(_cooldownRemaining).ToString("0") : string.Empty;
-            if (_abilityText != null) _abilityText.text = Name;
+            // No ability-name label: the button art already carries its text,
+            // matching the vanilla Kill/Use look (only the cooldown digits are
+            // overlaid, exactly like native buttons).
+        }
+
+        /// <summary>Hides the button without destroying it (ghost/lobby/meeting).</summary>
+        internal void Hide()
+        {
+            if (_button != null && _button && _button.activeSelf)
+                _button.SetActive(false);
         }
 
         internal void Maintain()
@@ -508,13 +580,13 @@ namespace TownOfUs.ManuAPI.Roles
             if (aspect != null)
             {
                 aspect.updateAlways = false;
-                aspect.DistanceFromEdge += SlotOffset;
+                aspect.DistanceFromEdge += SlotOffsetForIndex(SlotIndex);
                 aspect.AdjustPosition();
             }
             else
             {
                 // No anchor on the prefab: fall back to the Kill button's position.
-                clone.transform.position = hud.KillButton.transform.position + SlotOffset;
+                clone.transform.position = hud.KillButton.transform.position + SlotOffsetForIndex(SlotIndex);
             }
 
             // Preserve the native prefab's renderers/text/colliders.  The click
@@ -524,6 +596,17 @@ namespace TownOfUs.ManuAPI.Roles
             _renderer = nativeButton.spriteRender;
             _abilityText = nativeButton.AbilityText;
             _cooldownText = nativeButton.CooldownText;
+            if (_abilityText != null)
+            {
+                // Pure-art buttons: blank and hide the prefab's text label so
+                // only the artwork shows.
+                try
+                {
+                    _abilityText.text = string.Empty;
+                    _abilityText.gameObject.SetActive(false);
+                }
+                catch { }
+            }
             if (_renderer == null) _renderer = clone.GetComponentInChildren<SpriteRenderer>(true);
             if (_renderer != null)
             {

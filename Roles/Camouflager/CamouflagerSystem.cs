@@ -30,6 +30,14 @@ namespace TownOfUs.ManuAPI.Roles.Camouflager
         public static bool IsCamouflager(PlayerControl player) =>
             player != null && player.Data != null && RoleRegistry.IsAssigned(player, CamouflagerRole.Id);
 
+        /// <summary>
+        /// True while the round-wide camouflage is live. Presentation layers
+        /// (role name lines, Snitch red plates) must check this before writing
+        /// anything into nameText — they run at 10 Hz and would otherwise
+        /// overwrite the blanked names within a frame.
+        /// </summary>
+        internal static bool IsActive => _camoActive && DateTime.UtcNow < _camoUntil;
+
         internal static bool CanCamouflageNow(PlayerControl camouflager)
         {
             if (!IsCamouflager(camouflager) || camouflager.Data == null || camouflager.Data.IsDead) return false;
@@ -53,7 +61,6 @@ namespace TownOfUs.ManuAPI.Roles.Camouflager
             _camoActive = true;
             ApplyCamo();
             TownOfUsRpcMux.Send(StartRpc, duration);
-            Local("You camouflaged everyone.");
         }
 
         /// <summary>Runs every frame on every client: keep the grey while active, restore once on expiry.</summary>
@@ -74,6 +81,9 @@ namespace TownOfUs.ManuAPI.Roles.Camouflager
             foreach (var player in PlayerControl.AllPlayerControls)
             {
                 if (player == null) continue;
+                // Blank the overhead name too (Town-Of-Us Utils.Camouflage sets
+                // nameText.text = "") — grey bodies alone don't hide identities.
+                try { if (player.nameText != null) player.nameText.text = string.Empty; } catch { }
                 foreach (var renderer in player.GetComponentsInChildren<Renderer>(true))
                 {
                     if (renderer == null) continue;
@@ -88,6 +98,15 @@ namespace TownOfUs.ManuAPI.Roles.Camouflager
             {
                 if (player == null || player.Data == null) continue;
                 var colorId = player.Data.ColorId;
+                // Restore the overhead name from GameData (also undoes a blanked
+                // name; Morphling-style RpcSetName changes live in the same field,
+                // so Data.PlayerName is always the authoritative current value).
+                try
+                {
+                    if (player.nameText != null && !string.IsNullOrEmpty(player.Data.PlayerName))
+                        player.nameText.text = player.Data.PlayerName;
+                }
+                catch { }
                 foreach (var renderer in player.GetComponentsInChildren<Renderer>(true))
                 {
                     if (renderer == null) continue;
@@ -140,13 +159,5 @@ namespace TownOfUs.ManuAPI.Roles.Camouflager
         public static void OnGameEnded(GameEndedEventArgs _) => Reset();
         public static void OnMeetingStarted(MeetingEventArgs _) => Reset();
 
-        private static void Local(string message)
-        {
-            try
-            {
-                SystemChat.Show(message);
-            }
-            catch { }
-        }
     }
 }

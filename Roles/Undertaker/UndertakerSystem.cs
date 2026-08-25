@@ -59,14 +59,12 @@ namespace TownOfUs.ManuAPI.Roles.Undertaker
             Dragged[undertaker.PlayerId] = body.ParentId;
             Cooldowns[undertaker.PlayerId] = DateTime.UtcNow.AddSeconds(RoleConfig.Seconds(RoleConfig.UndertakerDragCooldown, 10f));
             TownOfUsRpcMux.Send(DragRpc, undertaker.PlayerId, body.ParentId);
-            Local("You are dragging a body. Press Drag again to drop it.");
         }
 
         private static void Drop(PlayerControl undertaker)
         {
             Dragged.Remove(undertaker.PlayerId);
             TownOfUsRpcMux.Send(DropRpc, undertaker.PlayerId);
-            Local("You dropped the body.");
         }
 
         /// <summary>Runs every frame on every client: keep dragged bodies following the Undertaker.</summary>

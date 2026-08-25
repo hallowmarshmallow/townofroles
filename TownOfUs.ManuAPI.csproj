@@ -16,6 +16,13 @@
          excluding them the SDK compiles both Debug and Release AssemblyInfo files,
          producing duplicate assembly attributes. -->
     <Compile Remove="UpdaterPatcher/**;obj/**;bin/**" />
+
+    <!-- Vendored sibling projects (MarshAPI -> API/, Manactor -> Networking/) have
+         their own csproj files; without these removals the SDK's recursive globs
+         would compile their sources into this assembly as well. -->
+    <Compile Remove="API/**;Networking/**" />
+    <EmbeddedResource Remove="API/**;Networking/**" />
+    <None Remove="API/**;Networking/**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,9 +32,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClassicUs.GameLibs" Version="2026.8.16.1" PrivateAssets="all" />
+    <PackageReference Include="ClassicUs.GameLibs" Version="2026.8.17.1" PrivateAssets="all" />
     <PackageReference Include="ClassicUs.Manactor" Version="1.1.0" PrivateAssets="all" ExcludeAssets="runtime" />
-    <PackageReference Include="ClassicUs.ManuAPI" Version="1.5.1" PrivateAssets="all" ExcludeAssets="runtime" />
+
+    <!-- MarshAPI is vendored in-repo under API/ and built from source with the mod.
+         The runtime DLL ships next to the plugin instead of coming pre-installed. -->
+    <ProjectReference Include="API/ManuAPI.csproj" />
   </ItemGroup>
 
   <!-- After a successful build, drop the plugin straight into the game's plugin folder
