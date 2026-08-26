@@ -1,5 +1,6 @@
 using System;
 using ClassicUs.ManuAPI;
+using ClassicUs.ManuAPI.UI;
 using TMPro;
 using UnityEngine;
 using TownOfUs.ManuAPI.Core;
@@ -128,6 +129,11 @@ namespace TownOfUs.ManuAPI.Core
             renderer.color = new Color(0f, 0f, 0f, 0.82f);
             renderer.sortingOrder = 100;
 
+            // Rounded window card so the modal reads as a dialog, plus an accent
+            // rule under the title — same chrome as GameConfigOverlay.
+            UiKit.MakePanel(_root.transform, "ToU_ModalWindow", new Vector3(0f, 0.1f, 0f), 6.6f, 4.6f, UiKit.PanelBg, 101);
+            UiKit.MakeDivider(_root.transform, "ToU_ModalRule", 0.82f, 5.6f);
+
             // Title + message text (font borrowed from an existing HUD label).
             // The source component is kept so text can be cloned instead of
             // AddComponent'd — see CreateText.
@@ -135,16 +141,18 @@ namespace TownOfUs.ManuAPI.Core
             var font = hud.GameSettingsTMP != null ? hud.GameSettingsTMP.font : null;
             var material = hud.GameSettingsTMP != null ? hud.GameSettingsTMP.fontSharedMaterial : null;
 
-            _titleText = CreateText("Title", font, material, new Vector3(0f, 1.3f, 0f), 4.2f, 101);
+            _titleText = CreateText("Title", font, material, new Vector3(0f, 1.3f, 0f), 3.4f, 110);
             _titleText.alignment = TextAlignmentOptions.Center;
+            _titleText.color = UiKit.AccentCyan;
 
-            _messageText = CreateText("Message", font, material, new Vector3(0f, 0.35f, 0f), 2.2f, 102);
+            _messageText = CreateText("Message", font, material, new Vector3(0f, 0.3f, 0f), 2.0f, 111);
             _messageText.alignment = TextAlignmentOptions.Center;
             _messageText.enableWordWrapping = true;
 
             // Buttons cloned from the native KillButton (AbilityButton pattern).
-            _updateButton = CreateButton(hud, "Update", "Update", new Vector3(-0.9f, -1.1f, 0f), OnUpdateClicked);
-            _laterButton = CreateButton(hud, "Later", "Later", new Vector3(0.9f, -1.1f, 0f), OnLaterClicked);
+            // Primary action in the positive accent, secondary as a muted chip.
+            _updateButton = CreateButton(hud, "Update", "Update", new Vector3(-0.9f, -1.1f, 0f), OnUpdateClicked, UiKit.GoodGreen);
+            _laterButton = CreateButton(hud, "Later", "Later", new Vector3(0.9f, -1.1f, 0f), OnLaterClicked, UiKit.ChipBlue);
         }
 
         private static TextMeshPro CreateText(string name, TMP_FontAsset font, Material material, Vector3 localPos, float fontSize, int sortOrder)
@@ -197,7 +205,7 @@ namespace TownOfUs.ManuAPI.Core
             return tmp;
         }
 
-        private static GameObject CreateButton(HudManager hud, string id, string label, Vector3 localPos, Action onClick)
+        private static GameObject CreateButton(HudManager hud, string id, string label, Vector3 localPos, Action onClick, Color? tint = null)
         {
             if (hud.KillButton == null) return null;
 
@@ -224,12 +232,23 @@ namespace TownOfUs.ManuAPI.Core
             aspect.updateAlways = true;
             aspect.AdjustPosition();
 
+            // Theme the round button background (accent for primary actions,
+            // muted chip otherwise) and lift it above the window card.
+            foreach (var sr in clone.GetComponentsInChildren<SpriteRenderer>(true))
+            {
+                if (sr == null) continue;
+                sr.color = tint ?? UiKit.ChipBlue;
+                sr.sortingOrder = 105;
+            }
+
             // Label.
             var tmp = clone.GetComponentInChildren<TextMeshPro>();
             if (tmp != null)
             {
                 tmp.text = label;
                 tmp.fontSize = Mathf.Max(2.5f, tmp.fontSize);
+                tmp.color = Color.white;
+                tmp.sortingOrder = 112;
             }
 
             // Delegate-free click dispatch (see ClickRouter): the native

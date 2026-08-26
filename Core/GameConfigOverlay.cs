@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ClassicUs.ManuAPI;
+using ClassicUs.ManuAPI.UI;
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
@@ -283,8 +284,14 @@ namespace TownOfUs.ManuAPI.Core
                 _material = hud.GameSettingsTMP.fontSharedMaterial;
             }
 
-            _title = MakeText("Title", "Town Of Us — Game Config", new Vector3(0f, 2.55f, 0f), 3.4f, Color.white, 115, persistent: true);
-            _hint = MakeText("Hint", "", new Vector3(0f, 2.05f, 0f), 1.5f, new Color(0.75f, 0.75f, 0.75f, 1f), 115, persistent: true);
+            // Window chrome: a rounded card behind every control plus an accent
+            // rule under the title, so the overlay reads as a real dialog
+            // instead of text floating on the black backdrop.
+            UiKit.MakePanel(_root.transform, "ToU_Window", new Vector3(0f, -0.15f, 0f), 9.6f, 6.3f, UiKit.PanelBg, 102);
+            UiKit.MakeDivider(_root.transform, "ToU_TitleRule", 2.3f, 8.8f);
+
+            _title = MakeText("Title", "Town Of Us — Game Config", new Vector3(0f, 2.62f, 0f), 3.4f, UiKit.AccentCyan, 115, persistent: true);
+            _hint = MakeText("Hint", "", new Vector3(0f, 2.02f, 0f), 1.5f, new Color(0.72f, 0.76f, 0.84f, 1f), 115, persistent: true);
         }
 
         private static void Render()
@@ -299,10 +306,12 @@ namespace TownOfUs.ManuAPI.Core
                     ? "Editing role pool (host) — press Done to close"
                     : "Role settings synced from host — read only";
 
-            MakeButton("TabCrewmate", "Crewmate", new Vector3(-3f, 1.55f, 0f), 1.5f, 1.8f, () => SetTab(0), _tab == 0);
-            MakeButton("TabImpostor", "Impostor", new Vector3(-1f, 1.55f, 0f), 1.5f, 1.8f, () => SetTab(1), _tab == 1);
-            MakeButton("TabNeutral", "Neutral", new Vector3(1f, 1.55f, 0f), 1.5f, 1.8f, () => SetTab(2), _tab == 2);
-            MakeButton("TabModifiers", "Modifiers", new Vector3(3f, 1.55f, 0f), 1.5f, 1.8f, () => SetTab(3), _tab == 3);
+            // Tabs: the active one lights up in the mod accent, inactive stay
+            // as muted chips.
+            MakeButton("TabCrewmate", "Crewmate", new Vector3(-3f, 1.55f, 0f), 1.5f, 1.8f, () => SetTab(0), _tab == 0, _tab == 0 ? UiKit.AccentCyan : (Color?)null);
+            MakeButton("TabImpostor", "Impostor", new Vector3(-1f, 1.55f, 0f), 1.5f, 1.8f, () => SetTab(1), _tab == 1, _tab == 1 ? UiKit.AccentCyan : (Color?)null);
+            MakeButton("TabNeutral", "Neutral", new Vector3(1f, 1.55f, 0f), 1.5f, 1.8f, () => SetTab(2), _tab == 2, _tab == 2 ? UiKit.AccentCyan : (Color?)null);
+            MakeButton("TabModifiers", "Modifiers", new Vector3(3f, 1.55f, 0f), 1.5f, 1.8f, () => SetTab(3), _tab == 3, _tab == 3 ? UiKit.AccentCyan : (Color?)null);
 
             float y = 0.85f;
             if (_tab == 3)
@@ -320,7 +329,8 @@ namespace TownOfUs.ManuAPI.Core
                 }
             }
 
-            MakeButton("Done", "Done", new Vector3(0f, -2.7f, 0f), 1.1f, 2.4f, Hide, true);
+            // Primary action: the Done button carries the positive accent.
+            MakeButton("Done", "Done", new Vector3(0f, -2.7f, 0f), 1.1f, 2.4f, Hide, true, UiKit.GoodGreen);
         }
 
         private static float BuildModifierRow(string key, string display, float y)
@@ -328,9 +338,11 @@ namespace TownOfUs.ManuAPI.Core
             bool enabled = RoleSettingsSync.GetBool(key + ".Enabled");
             float probability = RoleSettingsSync.GetFloat(key + ".Probability");
 
+            AddRowStrip(key, y);
             MakeText("Name_" + key.Replace(".", "_"), display, new Vector3(-3.7f, y, 0f), 1.6f, NeutralColor, 115);
             MakeButton(key + ".Enabled", enabled ? "On" : "Off", new Vector3(-2.15f, y, 0f), 0.7f, 1.6f,
-                () => { RoleSettingsSync.SetBool(key + ".Enabled", !RoleSettingsSync.GetBool(key + ".Enabled")); Render(); }, enabled);
+                () => { RoleSettingsSync.SetBool(key + ".Enabled", !RoleSettingsSync.GetBool(key + ".Enabled")); Render(); }, enabled,
+                enabled ? UiKit.GoodGreen : (Color?)null);
 
             MakeButton(key + ".Minus", "-", new Vector3(1.2f, y, 0f), 0.55f, 1.9f,
                 () => Step(key + ".Probability", "float", -5f), true);
@@ -348,9 +360,11 @@ namespace TownOfUs.ManuAPI.Core
             float chance = RoleSettingsSync.GetFloat(key + ".Chance");
             bool expanded = _expanded.Contains(key);
 
+            AddRowStrip(key, y);
             MakeText("Name_" + key, display, new Vector3(-3.7f, y, 0f), 1.7f, color, 115);
             MakeButton(key + ".Enabled", enabled ? "On" : "Off", new Vector3(-2.15f, y, 0f), 0.75f, 1.7f,
-                () => { RoleSettingsSync.SetBool(key + ".Enabled", !RoleSettingsSync.GetBool(key + ".Enabled")); Render(); }, enabled);
+                () => { RoleSettingsSync.SetBool(key + ".Enabled", !RoleSettingsSync.GetBool(key + ".Enabled")); Render(); }, enabled,
+                enabled ? UiKit.GoodGreen : (Color?)null);
 
             MakeButton(key + ".CountMinus", "-", new Vector3(-1.0f, y, 0f), 0.55f, 1.9f,
                 () => Step(key + ".Count", "int", -1), true);
@@ -389,7 +403,8 @@ namespace TownOfUs.ManuAPI.Core
             {
                 bool v = RoleSettingsSync.GetBool(full);
                 MakeButton(full + ".Toggle", v ? "On" : "Off", new Vector3(2.3f, y, 0f), 0.7f, 1.6f,
-                    () => { RoleSettingsSync.SetBool(full, !RoleSettingsSync.GetBool(full)); Render(); }, v);
+                    () => { RoleSettingsSync.SetBool(full, !RoleSettingsSync.GetBool(full)); Render(); }, v,
+                    v ? UiKit.GoodGreen : (Color?)null);
             }
             else if (kind == "string")
             {
@@ -422,6 +437,19 @@ namespace TownOfUs.ManuAPI.Core
 
             return y - 0.45f;
         }
+
+        /// <summary>
+        /// Faint full-width highlight behind one row of controls — separates
+        /// rows visually without alternating stripes.
+        /// </summary>
+        private static void AddRowStrip(string key, float y)
+        {
+            var strip = UiKit.MakePanel(_root.transform, "ToU_Strip_" + key.Replace(".", "_"),
+                new Vector3(0f, y, 0f), 9.0f, 0.5f, RowStrip, 104);
+            if (strip != null) _content.Add(strip);
+        }
+
+        private static readonly Color RowStrip = new(1f, 1f, 1f, 0.035f);
 
         /// <summary>Cycles two-option string settings (Faction/Role, Jester/Crewmate).</summary>
         private static string CycleString(string current)
@@ -501,7 +529,7 @@ namespace TownOfUs.ManuAPI.Core
             return tmp;
         }
 
-        private static GameObject MakeButton(string id, string label, Vector3 pos, float scale, float fontSize, Action onClick, bool bright)
+        private static GameObject MakeButton(string id, string label, Vector3 pos, float scale, float fontSize, Action onClick, bool bright, Color? tint = null)
         {
             var hud = HudManager.Instance;
             if (hud == null || hud.KillButton == null) return null;
@@ -546,7 +574,7 @@ namespace TownOfUs.ManuAPI.Core
             foreach (var sr in clone.GetComponentsInChildren<SpriteRenderer>(true))
             {
                 if (sr == null) continue;
-                sr.color = bright ? new Color(0.16f, 0.22f, 0.3f, 0.95f) : new Color(0.16f, 0.22f, 0.3f, 0.55f);
+                sr.color = tint ?? (bright ? UiKit.ChipBlue : UiKit.ChipBlueDim);
                 sr.sortingOrder = 110;
             }
 

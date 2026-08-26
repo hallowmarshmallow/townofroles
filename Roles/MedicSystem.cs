@@ -5,6 +5,7 @@ using ClassicUs.ManuAPI;
 using HarmonyLib;
 using TownOfUs.ManuAPI.Assets;
 using TownOfUs.ManuAPI.Core;
+using UnityEngine;
 
 namespace TownOfUs.ManuAPI.Roles.Medic
 {

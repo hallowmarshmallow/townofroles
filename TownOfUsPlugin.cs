@@ -995,6 +995,25 @@ namespace TownOfUs.ManuAPI
             try
             {
                 harmony.CreateClassProcessor(typeof(HudManager_FixedUpdate_CustomRoleAbilitiesPatch)).Patch();
+
+                // Leaving a lobby/freeplay mid-round never raises GameEnded, which
+                // used to leak role state into the next session. ExitGame covers
+                // explicit quits; HandleDisconnect covers kicks/errors/host close.
+                // Each applies independently so a renamed game method can only
+                // degrade to "state persists", never block plugin load.
+                foreach (var patchType in new[]
+                {
+                    typeof(Core.SessionReset.AmongUsClient_ExitGame_SessionPatch),
+                    typeof(Core.SessionReset.InnerNetClient_HandleDisconnect_SessionPatch),
+                })
+                {
+                    try { harmony.CreateClassProcessor(patchType).Patch(); }
+                    catch (Exception e)
+                    {
+                        Log.LogWarning("Session reset patch skipped (" + patchType.Name + "): " + e.Message);
+                    }
+                }
+
                 _batchHarmonyInstalled = true;
             }
             catch (Exception e)

@@ -1,4 +1,5 @@
 using ClassicUs.ManuAPI;
+using InnerNet;
 using UnityEngine;
 using TMPro;
 using TownOfUs.ManuAPI.Assets;
