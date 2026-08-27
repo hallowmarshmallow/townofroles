@@ -20,7 +20,7 @@
     <!-- Vendored sibling projects (MarshAPI -> API/, Manactor -> Networking/) have
          their own csproj files; without these removals the SDK's recursive globs
          would compile their sources into this assembly as well. -->
-    <Compile Remove="API/**;Networking/**;Stagg/**" />
+    <Compile Remove="API/**;Networking/**" />
     <EmbeddedResource Remove="API/**;Networking/**" />
     <None Remove="API/**;Networking/**" />
   </ItemGroup>

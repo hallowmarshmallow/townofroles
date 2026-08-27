@@ -18,8 +18,8 @@ Everything needed to build the full mod stack now lives in this single repo —
 no separate Manactor / MarshAPI checkouts required:
 
 ```
-TownOfUs.ManuAPI.csproj   plugin project root (Assets/ Commands/ Core/ Roles/
-                          UpdaterPatcher/ are its sources)
+TownOfUs.ManuAPI.csproj   plugin project root (Assets/ Commands/ Core/ Roles/ are its
+                          sources; UpdaterPatcher/ is a standalone project)
 API/                      vendored ClassicUs.MarshAPI source  -> ClassicUs.MarshAPI.dll
 Networking/               vendored ClassicUs.Reactor (Manactor) -> ClassicUs.Manactor.dll
 tools/                    packaging / update-server helpers
@@ -311,40 +311,25 @@ stub; if it breaks silently at runtime, re-run the interop diff from `PORTING.md
 ```
 TownOfUs.ManuAPI.csproj     # net6.0; refs GameLibs/Manactor/ManuAPI (+ local repack)
 TownOfUsPlugin.cs           # BepInEx entry: registers mod, RPCs, roles, GameEvents hooks
-Core/
-  ClosestPlayerFinder.cs    # shared nearest-target-in-kill-range helper
-Roles/Sheriff/              # ← the worked-example / template role
-  SheriffRole.cs            #   virtual Crewmate role descriptor
-  SheriffAbility.cs         #   CustomAbility shoot button (+ per-frame holder)
-  SheriffSystem.cs          #   shoot logic, kill-record RPC, self-report suppression
-  SheriffPatches.cs         #   optional Sheriff kill hook
-Roles/Engineer/              # native vent + Fix Sab role
-Roles/MedicRole.cs            # one-use shield role descriptor
-Roles/MedicSystem.cs          # shield RPC + BeforeMurder cancellation
-Roles/SeerRole.cs             # one-use investigation descriptor
-Roles/SeerSystem.cs           # faction investigation RPC/result
-Roles/VigilanteRole.cs        # one-shot vigilante descriptor
-Roles/VigilanteSystem.cs      # host-authoritative shot logic
-Roles/FirstBatchPatches.cs    # first-batch button routing/art refresh
-Assets/OriginalTownOfUs/Roles/ # cloned original Town Of Us PNG resources
-  EngineerRole.cs            #   virtual Crewmate role descriptor
-  EngineerAbility.cs         #   native repair call and button refresh
-  EngineerPatches.cs         #   targeted native button hooks
-Commands/
-  CommandSystem.cs           #   host-gated in-game slash commands
-  CommandPatches.cs          #   chat interception + local visual tick
-Core/
-  CommandConfig.cs           #   command toggle
-  VisualEffects.cs           #   local stepped color effects
-  Options.cs                #   ported Town-Of-Us tuning values
-packages/                   # local feeds: Windows packages + packages/linux native-Linux packages
-tools/
-  repack_gamelibs.py        # normalize the malformed nuget.org GameLibs nupkg (forward slashes)
-  update_gamelibs.py        # swap a new interop Assembly-CSharp.dll into the GameLibs nupkg
-  update_manuapi.py         # swap the rebuilt ManuAPI DLL into the nupkg + bump version
-  build_manuapi.sh          # rebuild Windows ManuAPI from source + repack
-  build_linux.sh             # generate/use Linux interop + rebuild native-Linux stack
-  _nupkg_utils.py           # shared nupkg rewrite (extract/modify/rezip, strips stale signature)
+Core/                       # shared runtime infra: config, presentation, RPC mux, updater
+Roles/                      # one folder per role/feature — mirrors its namespace
+  Sheriff/                  #   ← the worked-example / template role (Role/Ability/System/Patches/Options)
+  Engineer/                 #   native vent + Fix Sab role
+  Medic/                    #   one-use shield role (MedicRole + MedicSystem)
+  Seer/                     #   faction investigation (SeerRole + SeerSystem)
+  Vigilante/                #   one-shot vigilante (VigilanteRole + VigilanteSystem)
+  Assassin/ Janitor/ Morphling/ Camouflager/ Swooper/ Underdog/ Undertaker/ Miner/
+  Jester/ Executioner/ Arsonist/ Phantom/ Shifter/ Glitch/
+  Altruist/ Mayor/ Swapper/ Spy/ Investigator/ TimeLord/ Snitch/
+  Modifiers/                #   modifier system
+  Shared/                   #   cross-role helpers (CustomRoleAbilities, FreeplayRoleLayout)
+Commands/                   # host-gated in-game slash commands
+Networking/                 # vendored ClassicUs.Reactor (Manactor) source
+API/                        # vendored ClassicUs.MarshAPI source
+UpdaterPatcher/             # standalone updater patcher (own csproj, not part of the mod build)
+Assets/OriginalTownOfUs/    # cloned original Town Of Us PNG resources
+packages/                   # local NuGet feed: Windows + packages/linux native-Linux packages
+tools/                      # packaging / update-server helpers
 ```
 
 ## Original Town Of Us assets

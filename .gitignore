@@ -6,3 +6,7 @@ __pycache__/
 packages/
 *.zip
 dist/
+
+# core dumps (crashed builds)
+core
+*.core
