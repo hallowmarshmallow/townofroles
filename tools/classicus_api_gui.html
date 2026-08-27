@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classic Us — Account API GUI</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --text: #e6edf3;
+    --dim: #8b949e;
+    --pink: #f778ba;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1e2e 0%, #0d1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header .subtitle { color: var(--dim); font-size: 13px; }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 900px) {
+    .container { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .panel h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel h2 .icon { font-size: 18px; }
+  label {
+    display: block;
+    font-size: 13px;
+    color: var(--dim);
+    margin-bottom: 4px;
+    margin-top: 12px;
+  }
+  label:first-of-type { margin-top: 0; }
+  input, select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 14px;
+  }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { background: #79c0ff; }
+  .btn-green { background: var(--green); color: #000; }
+  .btn-green:hover { background: #56d364; }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-red:hover { background: #ff7b72; }
+  .btn-yellow { background: var(--yellow); color: #000; }
+  .btn-yellow:hover { background: #e3b341; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .status-bar {
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--dim);
+    border: 1px solid var(--border);
+    min-height: 40px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .status-bar.error { border-color: var(--red); color: var(--red); }
+  .status-bar.success { border-color: var(--green); color: var(--green); }
+  .profile-card {
+    display: none;
+    margin-top: 16px;
+  }
+  .profile-card.visible { display: block; }
+  .profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .stat-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-box .value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-box .label {
+    font-size: 11px;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+  .stat-box.highlight .value { color: var(--green); }
+  .stat-box.pink .value { color: var(--pink); }
+  .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .leaderboard-table th {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--dim);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .leaderboard-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #21262d;
+  }
+  .leaderboard-table tr:hover td { background: rgba(88,166,255,0.05); }
+  .rank-1 { color: #ffd700; font-weight: 700; }
+  .rank-2 { color: #c0c0c0; font-weight: 700; }
+  .rank-3 { color: #cd7f32; font-weight: 700; }
+  .tab-bar {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 16px;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 3px;
+    border: 1px solid var(--border);
+  }
+  .tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--dim);
+    transition: all 0.2s;
+  }
+  .tab.active { background: var(--accent); color: #000; }
+  .tab:hover:not(.active) { color: var(--text); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag-country { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .tag-runner { background: rgba(247,120,186,0.15); color: var(--pink); }
+  .like-progress {
+    display: none;
+    margin-top: 12px;
+  }
+  .like-progress.visible { display: block; }
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--accent));
+    border-radius: 3px;
+    transition: width 0.3s;
+    width: 0%;
+  }
+  .log-output {
+    margin-top: 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+  }
+  .log-output.visible { display: block; }
+  .log-line { padding: 1px 0; }
+  .log-line.success { color: var(--green); }
+  .log-line.error { color: var(--red); }
+  .log-line.info { color: var(--dim); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🚀 Classic Us — Account API GUI</h1>
+    <div class="subtitle">Account management, profiles, leaderboard, and social features</div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Left Panel: Auth -->
+  <div>
+    <div class="panel">
+      <h2><span class="icon">🔐</span> Authentication</h2>
+
+      <label>API Server</label>
+      <input type="text" id="apiUrl" value="http://178.156.171.131:22030">
+
+      <label>Device ID</label>
+      <input type="text" id="deviceId" value="">
+
+      <label>Email</label>
+      <input type="email" id="email" placeholder="you@email.com">
+
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••">
+
+      <label>Display Name</label>
+      <input type="text" id="displayName" placeholder="YourName">
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="doRegister()">Register</button>
+        <button class="btn btn-green" onclick="doLogin()">Login</button>
+        <button class="btn btn-yellow" onclick="doAutoLogin()">Auto</button>
+      </div>
+
+      <div class="status-bar" id="authStatus">Not connected</div>
+    </div>
+
+    <!-- Session Info -->
+    <div class="panel" style="margin-top:16px">
+      <h2><span class="icon">👤</span> Session</h2>
+      <div id="sessionInfo" style="font-size:13px; color:var(--dim)">No session active</div>
+      <div class="btn-row">
+        <button class="btn btn-red" onclick="doLogout()" style="margin-top:8px">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel: Tabs -->
+  <div>
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('profile')">Profile Lookup</div>
+      <div class="tab" onclick="switchTab('leaderboard')">Leaderboard</div>
+      <div class="tab" onclick="switchTab('social')">Social</div>
+      <div class="tab" onclick="switchTab('exploit')">Exploit</div>
+    </div>
+
+    <!-- Profile Tab -->
+    <div class="tab-content active" id="tab-profile">
+      <div class="panel">
+        <h2><span class="icon">🔍</span> Profile Lookup</h2>
+        <label>Profile ID (32-char hex)</label>
+        <div style="display:flex; gap:8px">
+          <input type="text" id="profileId" placeholder="6ccb53c489284986866b6e2fe3ade326">
+          <button class="btn btn-primary" onclick="fetchProfile()" style="margin-top:0; white-space:nowrap">Fetch</button>
+        </div>
+
+        <div class="profile-card" id="profileCard">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px">
+            <div style="font-size:28px; font-weight:700" id="profileName">—</div>
+            <span class="tag tag-country" id="profileCountry"></span>
+          </div>
+          <div class="profile-grid">
+            <div class="stat-box highlight"><div class="value" id="pScore">0</div><div class="label">Score</div></div>
+            <div class="stat-box"><div class="value" id="pGames">0</div><div class="label">Games</div></div>
+            <div class="stat-box"><div class="value" id="pWins">0</div><div class="label">Wins</div></div>
+            <div class="stat-box"><div class="value" id="pTasks">0</div><div class="label">Tasks</div></div>
+            <div class="stat-box pink"><div class="value" id="pLikes">0</div><div class="label">❤️ Likes</div></div>
+            <div class="stat-box"><div class="value" id="pViews">0</div><div class="label">👁️ Views</div></div>
+            <div class="stat-box"><div class="value" id="pBest">0</div><div class="label">Best Time</div></div>
+            <div class="stat-box"><div class="value" id="pStreak">0</div><div class="label">Best Streak</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard Tab -->
+    <div class="tab-content" id="tab-leaderboard">
+      <div class="panel">
+        <h2><span class="icon">🏆</span> Leaderboard</h2>
+        <div style="display:flex; gap:8px; align-items:center">
+          <select id="lbMode" style="width:auto" onchange="fetchLeaderboard()">
+            <option value="">Classic</option>
+            <option value="runner">Runner</option>
+          </select>
+          <select id="lbPage" style="width:auto" onchange="fetchLeaderboard()">
+          </select>
+          <button class="btn btn-primary" onclick="fetchLeaderboard()">Load</button>
+        </div>
+        <table class="leaderboard-table">
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Score</th><th>Games</th><th>Wins</th><th>Country</th><th>ID</th></tr>
+          </thead>
+          <tbody id="lbBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Social Tab -->
+    <div class="tab-content" id="tab-social">
+      <div class="panel">
+        <h2><span class="icon">❤️</span> Like a Profile</h2>
+        <label>Target Profile ID</label>
+        <input type="text" id="likeTarget" placeholder="6ccb53c489284986866b6e2fe3ade326">
+        <div class="btn-row">
+          <button class="btn btn-green" onclick="doLike()">Like</button>
+          <button class="btn btn-yellow" onclick="doLikeBulk()">Bulk Like (100)</button>
+        </div>
+        <div class="like-progress" id="likeProgress">
+          <div style="display:flex; justify-content:space-between; font-size:13px">
+            <span id="likeProgressText">0 / 100</span>
+            <span id="likeProgressCount">Likes: 0</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="likeProgressFill"></div></div>
+        </div>
+        <div class="log-output" id="likeLog"></div>
+      </div>
+    </div>
+
+    <!-- Exploit Tab -->
+    <div class="tab-content" id="tab-exploit">
+      <div class="panel">
+        <h2><span class="icon">⚠️</span> Like Farming Demo</h2>
+        <p style="font-size:13px; color:var(--dim); margin-bottom:12px">
+          Creates fake accounts and likes a profile. For bug reporting purposes only.
+        </p>
+        <label>Target Profile ID</label>
+        <input type="text" id="exploitTarget" placeholder="6ccb53c489284986866b6e2fe3ade326">
+        <label>Number of Likes</label>
+        <input type="number" id="exploitCount" value="50" min="1" max="10000">
+        <div class="btn-row">
+          <button class="btn btn-red" id="exploitBtn" onclick="runExploit()">🚀 Run Exploit</button>
+          <button class="btn btn-yellow" id="exploitStop" onclick="stopExploit()" disabled>Stop</button>
+        </div>
+        <div class="like-progress" id="exploitProgress">
+          <div style="display:flex; justify-content:space-between; font-size:13px">
+            <span id="exploitProgressText">0 / 50</span>
+            <span id="exploitProgressCount">Likes: 0 | Fails: 0</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="exploitProgressFill"></div></div>
+        </div>
+        <div class="log-output" id="exploitLog"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = () => document.getElementById('apiUrl').value.replace(/\/+$/, '');
+let session = null;
+let exploitRunning = false;
+let exploitAbort = false;
+
+// Generate a random device ID on load
+document.getElementById('deviceId').value = 'gui_' + Math.random().toString(36).substring(2, 10);
+
+function setStatus(id, msg, type='') {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'status-bar ' + type;
+}
+
+function log(id, msg, type='info') {
+  const el = document.getElementById(id);
+  el.classList.add('visible');
+  const line = document.createElement('div');
+  line.className = 'log-line ' + type;
+  line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+async function apiPost(path, body) {
+  const res = await fetch(API() + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function apiGet(path) {
+  const res = await fetch(API() + path);
+  return res.json();
+}
+
+// ── Auth ──────────────────────────────────────────────────────────
+async function doRegister() {
+  const device = document.getElementById('deviceId').value;
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
+  const name = document.getElementById('displayName').value;
+  setStatus('authStatus', 'Registering...');
+  try {
+    const r = await apiPost('/account/register', { device, email, pass, name });
+    if (r.ok) {
+      session = { device, token: r.token, account: r.account };
+      updateSession();
+      setStatus('authStatus', '✅ Registered! ID: ' + r.account.id, 'success');
+    } else {
+      setStatus('authStatus', '❌ ' + (r.error || 'Failed'), 'error');
+    }
+  } catch(e) { setStatus('authStatus', '❌ ' + e.message, 'error'); }
+}
+
+async function doLogin() {
+  const device = document.getElementById('deviceId').value;
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
+  setStatus('authStatus', 'Logging in...');
+  try {
+    const r = await apiPost('/account/login', { device, email, pass });
+    if (r.ok) {
+      session = { device, token: r.token, account: r.account };
+      updateSession();
+      setStatus('authStatus', '✅ Logged in! ID: ' + r.account.id, 'success');
+    } else {
+      setStatus('authStatus', '❌ ' + (r.error || 'Failed'), 'error');
+    }
+  } catch(e) { setStatus('authStatus', '❌ ' + e.message, 'error'); }
+}
+
+async function doAutoLogin() {
+  const device = document.getElementById('deviceId').value;
+  setStatus('authStatus', 'Auto-logging in...');
+  try {
+    const r = await apiPost('/account/auto', { device });
+    if (r.ok) {
+      session = { device, token: r.token, account: r.account };
+      updateSession();
+      setStatus('authStatus', '✅ Auto-login OK! ID: ' + r.account.id, 'success');
+    } else {
+      setStatus('authStatus', '❌ ' + (r.error || 'Failed'), 'error');
+    }
+  } catch(e) { setStatus('authStatus', '❌ ' + e.message, 'error'); }
+}
+
+function doLogout() {
+  session = null;
+  document.getElementById('sessionInfo').innerHTML = '<span style="color:var(--dim)">No session active</span>';
+  setStatus('authStatus', 'Logged out');
+}
+
+function updateSession() {
+  if (!session) return;
+  const a = session.account;
+  document.getElementById('sessionInfo').innerHTML = `
+    <div><b>${a.name || 'Unnamed'}</b></div>
+    <div style="color:var(--dim); font-size:12px; margin-top:4px">
+      ID: ${a.id}<br>
+      Email: ${a.email}<br>
+      Score: ${a.score} | Games: ${a.games}<br>
+      Country: ${a.country || 'Not set'}
+    </div>
+  `;
+}
+
+// ── Profile ───────────────────────────────────────────────────────
+async function fetchProfile() {
+  const id = document.getElementById('profileId').value.trim();
+  if (!id) return;
+  try {
+    const r = await apiGet('/account/profile?id=' + id);
+    if (!r.ok) { alert(r.error || 'Not found'); return; }
+    document.getElementById('profileCard').classList.add('visible');
+    document.getElementById('profileName').textContent = r.name || 'Unnamed';
+    document.getElementById('profileCountry').textContent = r.country || 'No country';
+    document.getElementById('pScore').textContent = r.score.toLocaleString();
+    document.getElementById('pGames').textContent = r.games.toLocaleString();
+    document.getElementById('pWins').textContent = r.wins.toLocaleString();
+    document.getElementById('pTasks').textContent = r.tasks.toLocaleString();
+    document.getElementById('pLikes').textContent = r.likes.toLocaleString();
+    document.getElementById('pViews').textContent = r.views.toLocaleString();
+    document.getElementById('pBest').textContent = r.bestSeconds ? (r.bestSeconds/60).toFixed(1) + 'm' : '—';
+    document.getElementById('pStreak').textContent = r.matchStreakBest || '—';
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ── Leaderboard ───────────────────────────────────────────────────
+async function fetchLeaderboard() {
+  const mode = document.getElementById('lbMode').value;
+  const page = document.getElementById('lbPage').value || 0;
+  const params = `page=${page}` + (mode ? `&mode=${mode}` : '');
+  try {
+    const r = await apiGet('/account/leaderboard?' + params);
+    if (!r.ok) return;
+    // Populate page dropdown
+    const sel = document.getElementById('lbPage');
+    if (sel.options.length !== r.pages) {
+      sel.innerHTML = '';
+      for (let i = 0; i < r.pages; i++) {
+        const opt = document.createElement('option');
+        opt.value = i; opt.textContent = `Page ${i+1}`;
+        if (i == page) opt.selected = true;
+        sel.appendChild(opt);
+      }
+    }
+    const tbody = document.getElementById('lbBody');
+    tbody.innerHTML = '';
+    for (const e of r.entries) {
+      const rankClass = e.rank <= 3 ? `rank-${e.rank}` : '';
+      tbody.innerHTML += `<tr>
+        <td class="${rankClass}">#${e.rank}</td>
+        <td>${e.name}</td>
+        <td>${e.score.toLocaleString()}</td>
+        <td>${e.games}</td>
+        <td>${e.wins}</td>
+        <td>${e.country || '—'}</td>
+        <td style="font-size:11px;color:var(--dim)">${e.id.substring(0,8)}…</td>
+      </tr>`;
+    }
+  } catch(e) { console.error(e); }
+}
+
+// ── Like ──────────────────────────────────────────────────────────
+async function doLike() {
+  if (!session) { alert('Login first!'); return; }
+  const target = document.getElementById('likeTarget').value.trim();
+  if (!target) return;
+  try {
+    const r = await apiPost(
+      `/account/profilelike?id=${target}&device=${session.device}&token=${session.token}`,
+      {}
+    );
+    // The server expects empty body with Content-Length: 0
+    const res = await fetch(API() + `/account/profilelike?id=${target}&device=${session.device}&token=${session.token}`, {
+      method: 'POST',
+      headers: { 'Content-Length': '0' }
+    });
+    const data = await res.json();
+    log('likeLog', `Like result: ${JSON.stringify(data)}`, data.ok ? 'success' : 'error');
+  } catch(e) { log('likeLog', 'Error: ' + e.message, 'error'); }
+}
+
+async function doLikeBulk() {
+  if (!session) { alert('Login first!'); return; }
+  const target = document.getElementById('likeTarget').value.trim();
+  if (!target) return;
+  const count = 100;
+  const progress = document.getElementById('likeProgress');
+  const fill = document.getElementById('likeProgressFill');
+  const text = document.getElementById('likeProgressText');
+  const countEl = document.getElementById('likeProgressCount');
+  progress.classList.add('visible');
+  let success = 0, fail = 0;
+
+  for (let i = 0; i < count; i++) {
+    try {
+      // Create a fresh account for each like
+      const dev = 'bulk_' + Math.random().toString(36).substring(2,10) + i;
+      await apiPost('/account/auto', { device: dev });
+      const lr = await apiPost('/account/login', { device: dev, email: dev + '@test.com', pass: 'password123' });
+      const token = lr.token;
+      const res = await fetch(API() + `/account/profilelike?id=${target}&device=${dev}&token=${token}`, {
+        method: 'POST', headers: { 'Content-Length': '0' }
+      });
+      const data = await res.json();
+      if (data.ok) success++; else fail++;
+      text.textContent = `${i+1} / ${count}`;
+      countEl.textContent = `Likes: ${data.likes || '?'} | OK: ${success} Fail: ${fail}`;
+      fill.style.width = ((i+1)/count*100) + '%';
+    } catch(e) { fail++; }
+  }
+  log('likeLog', `Bulk done: ${success} likes, ${fail} fails`, 'success');
+}
+
+// ── Exploit ───────────────────────────────────────────────────────
+async function runExploit() {
+  if (exploitRunning) return;
+  exploitRunning = true;
+  exploitAbort = false;
+  document.getElementById('exploitBtn').disabled = true;
+  document.getElementById('exploitStop').disabled = false;
+
+  const target = document.getElementById('exploitTarget').value.trim();
+  const count = parseInt(document.getElementById('exploitCount').value) || 50;
+  const progress = document.getElementById('exploitProgress');
+  const fill = document.getElementById('exploitProgressFill');
+  const text = document.getElementById('exploitProgressText');
+  const countEl = document.getElementById('exploitProgressCount');
+  progress.classList.add('visible');
+  let success = 0, fail = 0;
+
+  log('exploitLog', `Starting exploit: ${count} likes on ${target}`, 'info');
+
+  for (let i = 0; i < count && !exploitAbort; i++) {
+    try {
+      const dev = 'exploit_' + Math.random().toString(36).substring(2,10) + '_' + i;
+      await apiPost('/account/auto', { device: dev });
+      const lr = await apiPost('/account/login', { device: dev, email: dev + '@exploit.com', pass: 'password123' });
+      const token = lr.token;
+      const res = await fetch(API() + `/account/profilelike?id=${target}&device=${dev}&token=${token}`, {
+        method: 'POST', headers: { 'Content-Length': '0' }
+      });
+      const data = await res.json();
+      if (data.ok) { success++; } else { fail++; }
+      text.textContent = `${i+1} / ${count}`;
+      countEl.textContent = `Likes: ${data.likes || '?'} | OK: ${success} Fail: ${fail}`;
+      fill.style.width = ((i+1)/count*100) + '%';
+      if ((i+1) % 50 === 0) {
+        log('exploitLog', `Progress: ${i+1}/${count} — Likes: ${data.likes} — OK: ${success} Fail: ${fail}`, 'success');
+      }
+    } catch(e) { fail++; log('exploitLog', 'Error: ' + e.message, 'error'); }
+  }
+
+  log('exploitLog', `Finished: ${success} likes, ${fail} fails`, exploitAbort ? 'error' : 'success');
+  exploitRunning = false;
+  document.getElementById('exploitBtn').disabled = false;
+  document.getElementById('exploitStop').disabled = true;
+}
+
+function stopExploit() {
+  exploitAbort = true;
+}
+
+// Init leaderboard
+fetchLeaderboard();
+</script>
+</body>
+</html>
